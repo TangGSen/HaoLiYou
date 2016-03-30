@@ -135,8 +135,7 @@ public class FragmentStudy extends BaseFragment implements SwipeRefreshLayout.On
             //创建并设置Adapter
             adapter = new StudyRecyclerAdapter(getActivity(), LesssListData);
             study_lesson_recyclerview.setAdapter(adapter);
-            //设置Item增加、移除动画
-            study_lesson_recyclerview.setItemAnimator(new DefaultItemAnimator());
+
             adapter.setOnItemClickListener(new StudyRecyclerAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position, LessonItemBean childItemBean) {
@@ -250,6 +249,23 @@ public class FragmentStudy extends BaseFragment implements SwipeRefreshLayout.On
         //填一个的时候不认
         swipe_refresh_widget.setColorSchemeResources(R.color.theme_color, R.color.theme_color);
         swipe_refresh_widget.setOnRefreshListener(this);
+
+        //判断RecycleView 上下滑的时候，swipe_refresh_widget 的开关
+        study_lesson_recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                swipe_refresh_widget.setEnabled(topRowVerticalPosition >= 0);
+
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
 
 
     }

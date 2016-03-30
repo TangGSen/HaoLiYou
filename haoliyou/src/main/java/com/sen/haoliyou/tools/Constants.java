@@ -10,10 +10,10 @@ public class Constants {
     //接口
 
     // 外网地址
-    // public static final String PATH = "http://192.168.0.20/";
+     public static final String PATH = "http://192.168.0.20/";
 //	 public static final String PATH = "http://sec.cncm.com.cn/";
 //    public static final String PATH = "http://111.202.9.28:15030/";
-    public static final String PATH = "http://139.129.8.158/";
+//    public static final String PATH = "http://139.129.8.158/";
 //    public static final String PATH = "http://192.168.50.124/";
 
 //    1.app 更新
