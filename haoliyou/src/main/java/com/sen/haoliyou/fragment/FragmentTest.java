@@ -164,6 +164,22 @@ public class FragmentTest extends BaseFragment  implements SwipeRefreshLayout.On
         test_recylerview.addItemDecoration(new RecyleViewItemDecoration(getContext(), R.drawable.shape_recycle_item_decoration));
         swipe_refresh_widget.setColorSchemeResources(R.color.theme_color,R.color.theme_color);
         swipe_refresh_widget.setOnRefreshListener(this);
+
+        //判断RecycleView 上下滑的时候，swipe_refresh_widget 的开关
+        test_recylerview.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                swipe_refresh_widget.setEnabled(topRowVerticalPosition >= 0);
+
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     public void onEvent(EventSubmitAnswerSucess event) {
@@ -191,6 +207,7 @@ public class FragmentTest extends BaseFragment  implements SwipeRefreshLayout.On
     }
 
     private void getExamListData() {
+       Log.e("sen",AcountManager.getAcountId()) ;
         if (!NetUtil.isNetworkConnected(getActivity())) {
             Toast.makeText(getContext(), R.string.has_not_net, Toast.LENGTH_SHORT).show();
             return;

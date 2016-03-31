@@ -50,7 +50,7 @@ import okhttp3.Response;
 /**
  * Created by Sen on 2016/3/3.
  */
-public class FragmentRepository extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener{
+public class FragmentRepository extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     private View rootView;
     @Bind(R.id.resourse_et_search)
     AppCompatTextView resourse_et_search;
@@ -148,7 +148,10 @@ public class FragmentRepository extends BaseFragment implements SwipeRefreshLayo
             return;
         }
         allResourseKindBean.clear();
+
         allResourseKindBean.addAll(cataLogList);
+
+
         cataLogList.clear();
         LessonCatalogAdapter cataLogAdapter = new LessonCatalogAdapter(getActivity(), allResourseKindBean);
         resourse_listview.setAdapter(cataLogAdapter);
@@ -206,12 +209,28 @@ public class FragmentRepository extends BaseFragment implements SwipeRefreshLayo
         resourse_listview.setHasFixedSize(true);
 //            添加分割线
         resourse_listview.addItemDecoration(new RecyleViewItemDecoration(getContext(), R.drawable.shape_recycle_item_decoration));
-        swipe_refresh_widget.setColorSchemeResources(R.color.theme_color,R.color.theme_color);
+        swipe_refresh_widget.setColorSchemeResources(R.color.theme_color, R.color.theme_color);
         swipe_refresh_widget.setOnRefreshListener(this);
+
+        //判断RecycleView 上下滑的时候，swipe_refresh_widget 的开关
+        resourse_listview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                swipe_refresh_widget.setEnabled(topRowVerticalPosition >= 0);
+
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     public void onEvent(EventComentCountForResouce event) { //接收方法  在发关事件的线程接收
-        if (event != null && allCourseList!=null && studyRecyclerAdapter!=null) {
+        if (event != null && allCourseList != null && studyRecyclerAdapter != null) {
             LessonItemBean lessonItemBean = allCourseList.get(event.getPosition());
             int count = (Integer.parseInt(lessonItemBean.getComment()) + event.getSucessCount());
             lessonItemBean.setComment(count + "");
@@ -301,7 +320,7 @@ public class FragmentRepository extends BaseFragment implements SwipeRefreshLayo
         startActivity(intent);
     }
 
-//刷新
+    //刷新
     @Override
     public void onRefresh() {
         mHandler.postDelayed(new Runnable() {

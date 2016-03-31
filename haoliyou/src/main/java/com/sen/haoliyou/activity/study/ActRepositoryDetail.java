@@ -107,6 +107,22 @@ public class ActRepositoryDetail extends BaseActivity implements SwipeRefreshLay
         swipe_refresh_widget.setColorSchemeResources(R.color.theme_color, R.color.theme_color);
         swipe_refresh_widget.setOnRefreshListener(this);
 
+        //判断RecycleView 上下滑的时候，swipe_refresh_widget 的开关
+        resourse_detail_listview.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                swipe_refresh_widget.setEnabled(topRowVerticalPosition >= 0);
+
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
 
     }
 
@@ -175,6 +191,7 @@ public class ActRepositoryDetail extends BaseActivity implements SwipeRefreshLay
             return;
         }
         allCourseList.clear();
+
         allCourseList.addAll(courseList);
         courseList.clear();
         studyRecyclerAdapter = new StudyRecyclerAdapter(this, allCourseList);
@@ -203,6 +220,7 @@ public class ActRepositoryDetail extends BaseActivity implements SwipeRefreshLay
             return;
         }
         allResourseKindBean.clear();
+
         allResourseKindBean.addAll(cataLogList);
         cataLogList.clear();
         LessonCatalogAdapter cataLogAdapter = new LessonCatalogAdapter(this, allResourseKindBean);
