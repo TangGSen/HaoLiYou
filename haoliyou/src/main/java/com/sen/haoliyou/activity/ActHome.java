@@ -39,7 +39,7 @@ public class ActHome extends BaseActivity {
     @Bind(R.id.act_home_coach)
     AppCompatImageView act_home_coach;
 
-
+//马达，为啥我的git commit 不了
     @Override
     protected void init() {
         super.init();

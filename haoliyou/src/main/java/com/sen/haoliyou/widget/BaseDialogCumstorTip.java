@@ -122,6 +122,7 @@ public class BaseDialogCumstorTip {
         this.mDialogListener = dialogListener;
         final CustomerDialog  btnDialog = new CustomerDialog(context, 230, 140, R.layout.base_twobtnonemsg_customer_tip_dialog, R.style.Theme_dialog);
         btnDialog.setCanceledOnTouchOutside(false);
+        btnDialog.setCancelable(false);
         btnDialog.show();
         AppCompatTextView txt_message = (AppCompatTextView) btnDialog.findViewById(R.id.twobtn_onemsg_txt_msg);
         AppCompatButton btn_ok = (AppCompatButton) btnDialog.findViewById(R.id.twobtn_onemsg_btn_ok);
@@ -157,6 +158,7 @@ public class BaseDialogCumstorTip {
         this.mDialogListener = dialogListener;
         final CustomerDialog  btnDialog = new CustomerDialog(context, width, height, R.layout.base_onebtnonemsg_tip_dialog, R.style.Theme_dialog);
         btnDialog.setCanceledOnTouchOutside(false);
+        btnDialog.setCancelable(false);
         btnDialog.show();
         AppCompatTextView txt_message = (AppCompatTextView) btnDialog.findViewById(R.id.txt_msg);
         AppCompatButton btn_ok = (AppCompatButton) btnDialog.findViewById(R.id.onebtn_ok);
