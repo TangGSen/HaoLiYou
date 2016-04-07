@@ -104,11 +104,12 @@ public class ActWriteComment extends BaseActivity {
 
     @OnClick(R.id.btn_submit)
     public void submitContent() {
-        btn_submit.setEnabled(false);
+
         getContext = et_content.getText().toString().trim();
         if (getContext == null || getContext.length() == 0) {
             Toast.makeText(ActWriteComment.this, "评论内容不能为空", Toast.LENGTH_SHORT).show();
         } else {
+            btn_submit.setEnabled(false);
             submitReview(getContext);
         }
     }
