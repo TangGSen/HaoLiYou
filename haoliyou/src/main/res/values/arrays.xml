@@ -4,6 +4,7 @@
         <item>学习</item>
         <item>考试</item>
         <item>资源库</item>
+        <item>培训评估</item>
     </string-array>
 
     <integer-array name="my_material_colors">

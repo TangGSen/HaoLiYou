@@ -58,7 +58,7 @@ import okhttp3.Response;
 /**
  * Created by Sen on 2016/3/3.
  */
-public class FragmentStudy extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private View rootView;
     @Bind(R.id.study_toolbar)

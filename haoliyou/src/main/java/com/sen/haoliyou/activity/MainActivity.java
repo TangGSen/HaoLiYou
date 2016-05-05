@@ -12,10 +12,10 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
+import com.sen.haoliyou.fragment.FragmentAssessment;
 import com.sen.haoliyou.fragment.FragmentRepository;
 import com.sen.haoliyou.fragment.FragmentStudy;
 import com.sen.haoliyou.fragment.FragmentTest;
@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity {
     private FragmentStudy mFragmentStudy;
     private FragmentTest mFragmentTest;
     private FragmentRepository mFragmentRepository;
+    private FragmentAssessment mFragmentAssessment;
 
     private int currentFragPosition = 0;
     private final String FRAG_POSITION = "currentFragPosition";
@@ -52,8 +53,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void init() {
         super.init();
-        Intent intent =getIntent();
-        currentFragPosition = intent.getIntExtra("position",0);
+        Intent intent = getIntent();
+        currentFragPosition = intent.getIntExtra("position", 0);
     }
 
     public void initView(Bundle savedInstanceState) {
@@ -67,22 +68,22 @@ public class MainActivity extends BaseActivity {
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         tabTiles = ResourcesUtils.getStringArray(this, R.array.tabButtonItemName);
-        tabItemDrawableNormal = new int[]{R.mipmap.tab_study_unselected, R.mipmap.tab_test_unselected,  R.mipmap.tab_repository_unselected};
-        tabItemDrawableSelected = new int[]{R.mipmap.tab_study_selected, R.mipmap.tab_test_selected,  R.mipmap.tab_repository_selected};
+        tabItemDrawableNormal = new int[]{R.mipmap.tab_study_unselected, R.mipmap.tab_test_unselected, R.mipmap.tab_repository_unselected, R.mipmap.tab_repository_unselected};
+        tabItemDrawableSelected = new int[]{R.mipmap.tab_study_selected, R.mipmap.tab_test_selected, R.mipmap.tab_repository_selected, R.mipmap.tab_repository_selected};
         initTabView();
         mFragmentManager = getSupportFragmentManager();
         if (savedInstanceState != null) {
             //取出上一次保存的数据
-            currentFragPosition = savedInstanceState.getInt(FRAG_POSITION,0);
-            Log.e("sen","恢复的状态"+currentFragPosition);
+            currentFragPosition = savedInstanceState.getInt(FRAG_POSITION, 0);
+            Log.e("sen", "恢复的状态" + currentFragPosition);
             mFragmentStudy = (FragmentStudy) mFragmentManager.findFragmentByTag(tabTiles[0]);
             mFragmentTest = (FragmentTest) mFragmentManager.findFragmentByTag(tabTiles[1]);
             mFragmentRepository = (FragmentRepository) mFragmentManager.findFragmentByTag(tabTiles[2]);
+            mFragmentAssessment = (FragmentAssessment) mFragmentManager.findFragmentByTag(tabTiles[3]);
         }
         layout_buttom_tab.getTabAt(currentFragPosition).select();
         setSelectedFragment(currentFragPosition);
     }
-
 
 
     private void setSelectedFragment(int position) {
@@ -116,6 +117,14 @@ public class MainActivity extends BaseActivity {
                     transaction.show(mFragmentRepository);
                 }
                 break;
+            case 3:
+                if (mFragmentAssessment == null) {
+                    mFragmentAssessment = new FragmentAssessment();
+                    transaction.add(R.id.home_layout_content, mFragmentAssessment, tabTiles[position]);
+                } else {
+                    transaction.show(mFragmentAssessment);
+                }
+                break;
 
         }
         currentFragPosition = position;
@@ -132,6 +141,9 @@ public class MainActivity extends BaseActivity {
         if (mFragmentRepository != null) {
             transaction.hide(mFragmentRepository);
         }
+        if (mFragmentAssessment != null) {
+            transaction.hide(mFragmentAssessment);
+        }
 
     }
 
@@ -139,11 +151,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         //保存tab选中的状态
-        Log.e("sen","保存tab选中的状态"+currentFragPosition);
+        Log.e("sen", "保存tab选中的状态" + currentFragPosition);
         outState.putInt(FRAG_POSITION, currentFragPosition);
         super.onSaveInstanceState(outState);
     }
-
 
 
     private void initTabView() {
@@ -217,16 +228,15 @@ public class MainActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if((System.currentTimeMillis()-exitTime) >2000)  {
-                ToastUtils.showTextToast(MainActivity.this,ResourcesUtils.getResString(MainActivity.this,R.string.two_down_back_exitapp));
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                ToastUtils.showTextToast(MainActivity.this, ResourcesUtils.getResString(MainActivity.this, R.string.two_down_back_exitapp));
                 exitTime = System.currentTimeMillis();
-            }else {
+            } else {
                 exitApp();
             }
         }
         return true;
     }
-
 
 
 }

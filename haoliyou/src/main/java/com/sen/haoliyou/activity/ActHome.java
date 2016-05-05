@@ -155,8 +155,7 @@ public class ActHome extends BaseActivity {
 
     @OnClick(R.id.act_home_coach)
     public void coachPage() {
-        Intent intent = new Intent(ActHome.this,DevelopingActivity.class);
-        startActivity(intent);
+        jumpToMain(3);
     }
 
 
