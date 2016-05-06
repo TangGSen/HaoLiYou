@@ -10,7 +10,6 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -29,8 +28,7 @@ import android.widget.ViewFlipper;
 import com.alibaba.fastjson.JSON;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
-import com.sen.haoliyou.exam.ExamTestHomeBean;
-import com.sen.haoliyou.exam.QuestionList;
+import com.sen.haoliyou.mode.ActDoAssessHome;
 import com.sen.haoliyou.mode.EventNoThing;
 import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
 import com.sen.haoliyou.mode.ExamAnswerJsonBean;
@@ -98,7 +96,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private int allQusSize;
 
 
-    private List<QuestionList> questionLists;
+    private List<ActDoAssessHome.QuListBean> questionLists;
     private final int viewChaceSize = 3;
     private LinkedHashMap<String, View> viewChace = new LinkedHashMap<>();
     private String paperId;
@@ -112,16 +110,18 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
                 case 1:
 
-                    ExamTestHomeBean homeBeam = (ExamTestHomeBean) msg.obj;
-                    paperId = homeBeam.getPaperid();
-                    questionLists = homeBeam.getQuestionList();
+                    ActDoAssessHome homeBeam = (ActDoAssessHome) msg.obj;
+
+                    questionLists = homeBeam.getQu_list();
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
+                        DialogUtils.closeUnCancleDialog();
                         Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
+                        DialogUtils.closeUnCancleDialog();
                         Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
                         return false;
                     }
@@ -186,6 +186,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+
     }
 
     public static void toThis(Context context, String demandId, String assessName) {
@@ -201,6 +202,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         Intent intent = getIntent();
         demandId = intent.getStringExtra(DEMAND_ID);
         assessName = intent.getStringExtra(ASSESS_NAME);
+        Log.e("sen",demandId);
         if (assessName == null) {
             assessName = "";
         }
@@ -246,18 +248,17 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 .url(url)
                 .addParams("demand_id", demandId)
                 .build()
-                .execute(new Callback<ExamTestHomeBean>() {
+                .execute(new Callback<ActDoAssessHome>() {
                     @Override
                     public void onBefore(Request request) {
                         super.onBefore(request);
                     }
 
                     @Override
-                    public ExamTestHomeBean parseNetworkResponse(Response response) throws Exception {
+                    public ActDoAssessHome parseNetworkResponse(Response response) throws Exception {
 
                         String string = response.body().string();
-                        Log.e("sen", string);
-                        ExamTestHomeBean lesssonBean = JSON.parseObject(string, ExamTestHomeBean.class);
+                        ActDoAssessHome lesssonBean = JSON.parseObject(string, ActDoAssessHome.class);
                         return lesssonBean;
                     }
 
@@ -265,11 +266,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     public void onError(Call call, Exception e) {
                         mHandler.sendEmptyMessage(GETDATA_ERROR);
 
-
                     }
 
                     @Override
-                    public void onResponse(ExamTestHomeBean homeBeam) {
+                    public void onResponse(ActDoAssessHome homeBeam) {
                         Message message = Message.obtain();
                         message.obj = homeBeam;
                         message.what = SHOW_DATA;
@@ -316,14 +316,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private int currtentType = -1;
 
     private void setQuestionType(String type) {
-        if ("单选题".equals(type) || "判断题".equals(type)) {
+        if ("1".equals(type) ) {
             currtentType = 1;
-        } else if ("多选题".equals(type)) {
+        } else if ("2".equals(type)) {
             currtentType = 2;
-        } else if ("填空题".equals(type)) {
+        } else if ("3".equals(type)) {
             currtentType = 3;
-        } else if ("论述题".equals(type) || "简答题".equals(type)) {
-            currtentType = 4;
         }
     }
 
@@ -331,7 +329,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private View addCustomView(final int currentNum) {
         // 找控件（viewflipper里的所有控件）
         //先在ViewChace 找，如果能找到
-        String typeQuestion = questionLists.get(currentNum).getTestquestype(); // 题型
+        //显示大标题
+        ActDoAssessHome.QuListBean questionItem = questionLists.get(currentNum);
+        String bitTile =questionItem.getBig_title();
+        String typeQuestion = questionItem.getTerm_type();
         setQuestionType(typeQuestion);
         View view = null;
         view = viewChace.get(questionLists.get(currentNum).getId());
@@ -346,9 +347,9 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         tv_test_title = (AppCompatTextView) view.findViewById(R.id.tv_test_title);
         radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
-        String options_show = questionLists.get(currentNum).getOptions();
+        String options_show = questionLists.get(currentNum).getOption();
 
-        String tv_question_string = (currentNum + 1) + ".[" + typeQuestion + "]" + questionLists.get(currentNum).getQuestion() + "\n(" + questionLists.get(currentNum).getScore() + "分)";
+        String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title() ;
         tv_test_title.setText(tv_question_string);
 
         if (currtentType == 1) {
@@ -356,9 +357,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         } else if (currtentType == 2) {
             showMutileChoose(currentNum, options_show, layout_other_type_exam);
         } else if (currtentType == 3) {
-            showFillblanks(currentNum, options_show, layout_other_type_exam);
-
-        } else if (currtentType == 4) {
             showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam);
         }
         addViewChace(questionLists.get(currentNum).getId(), view);
@@ -413,109 +411,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         layout_other_type_exam.addView(edit);
     }
 
-    //显示填空题
-    private void showFillblanks(final int currentNum, String options, LinearLayout layout_other_type_exam) {
-        showVisbityAble(false, true);
-        final int optionCount = Integer.parseInt(options);
-        final String[] editAnswer = new String[optionCount];
 
-        for (int i = 0; i < optionCount; i++) {
-            LinearLayout linearLayout = new LinearLayout(this);
-            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.
-                    LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            param.setMargins(0, 32, 0, 32);
-            linearLayout.setLayoutParams(param);
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-            AppCompatTextView textView = new AppCompatTextView(this);
-            textView.setText((i + 1) + ".");
-            textView.setTextSize(14);
-            textView.setGravity(Gravity.CENTER_VERTICAL);
-            textView.setTextColor(ResourcesUtils.getResColor(this, R.color.font_h2));
-
-            linearLayout.addView(textView);
-
-            final AppCompatEditText edit = new AppCompatEditText(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            edit.setLayoutParams(params);
-            edit.setGravity(Gravity.CENTER_VERTICAL);
-            params.setMargins(8, 0, 0, 0);
-            edit.setPadding(16, 16, 16, 16);
-            edit.setTextSize(15);
-            final int currentEditext = i;
-            edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
-            edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
-            linearLayout.addView(edit);
-            layout_other_type_exam.addView(linearLayout);
-            edit.addTextChangedListener(new TextWatcher() {
-                private CharSequence temp;
-                private int editStart;
-                private int editEnd;
-                private boolean isDialogShow = true;
-
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    temp = s;
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    editStart = edit.getSelectionStart();
-                    editEnd = edit.getSelectionEnd();
-                    if (temp.toString().contains("|")) {
-                        s.delete(editStart - 1, editEnd);
-                        showTipType();
-                    }
-                    editAnswer[currentEditext] = s.toString();
-                    StringBuffer sb = new StringBuffer();
-                    for (int i = 0; i < optionCount; i++) {
-                        String answer = editAnswer[i];
-                        if (TextUtils.isEmpty(answer)) {
-                            answer = " ";
-                        }
-                        if (optionCount <= 1 || i == optionCount - 1) {
-                            sb.append(answer);
-                        } else {
-                            sb.append(answer + "|");
-                        }
-
-                    }
-
-                    addToAnswer(currentNum, sb.toString());
-
-
-                }
-
-                private void showTipType() {
-                    if (!isDialogShow) {
-                        Toast.makeText(ActDoAssess.this, "填空题不能包含'|'特殊符号,请换其他替代", Toast.LENGTH_SHORT).show();
-                    } else {
-                        isDialogShow = false;
-                        BaseDialogCumstorTip.getDefault().showOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-                            @Override
-                            public void onLeftButtonClick(CustomerDialog dialog) {
-                                dialog.dismiss();
-                            }
-
-                            @Override
-                            public void onRigthButtonClick(CustomerDialog dialog) {
-
-                            }
-                        },260,160, ActDoAssess.this,"温馨提示",ResourcesUtils.getResString(ActDoAssess.this,R.string.test_input_error),"确定",true,true);
-
-                    }
-                }
-            });
-
-        }
-
-
-    }
 
 
     //显示单选题
@@ -535,7 +431,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         int size = options.length;
         for (int i = 0; i < size; i++) {
             final AppCompatRadioButton radioButton = new AppCompatRadioButton(ActDoAssess.this);
-            radioButton.setText(options[i]);
+            final String[] idAndQestion = options[i].split("\\-");
+            radioButton.setText(idAndQestion[1]);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             radioButton.setPadding(0, 40, 0, 40);
             radioButton.setLayoutParams(params);
@@ -548,7 +445,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 @Override
                 public void onClick(View arg0) {
 
-                    addToAnswer(currentNum, answerToChose[temp]);
+                    addToAnswer(currentNum, idAndQestion[0]);
 
                 }
             });
@@ -556,13 +453,14 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     }
 
     private void addToAnswer(int currentNum, String answer) {
-        QuestionList question = questionLists.get(currentNum);
+        ActDoAssessHome.QuListBean question = questionLists.get(currentNum);
         String key = question.getId();
         if (answerMap.containsKey(key)) {
             ExamUserAnswer userAnswer = answerMap.get(key);
             userAnswer.setAnswer(answer);
         } else {
-            answerMap.put(key, new ExamUserAnswer(key, answer, question.getType()));
+            //待会修改
+          //  answerMap.put(key, new ExamUserAnswer(key, answer, question.getType()));
         }
 
     }
@@ -574,7 +472,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         final String[] mMutilChoose = new String[size];
         for (int i = 0; i < size; i++) {
             final AppCompatCheckBox checkBox = new AppCompatCheckBox(ActDoAssess.this);
-            checkBox.setText(array_options[i]);
+            checkBox.setText(array_options[i].split("\\-")[1]);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             checkBox.setPadding(0, 40, 0, 40);
             checkBox.setLayoutParams(params);
@@ -679,21 +577,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
                 break;
             case 3:
-                String[] split = userAnswerStr.split("\\|");
-                int count = split.length;
-                layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
-                for (int i = 0; i < count; i++) {
-
-                    LinearLayout child = (LinearLayout) layout_other_type_exam.getChildAt(i);
-                    AppCompatEditText editChild = (AppCompatEditText) child.getChildAt(1);
-                    editChild.setText(split[i]);
-                }
-                break;
-            case 4:
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
                 AppCompatEditText child = (AppCompatEditText) layout_other_type_exam.getChildAt(0);
                 child.setText(userAnswerStr);
                 break;
+
         }
 
 
