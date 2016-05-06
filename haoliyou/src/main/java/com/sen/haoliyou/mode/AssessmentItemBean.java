@@ -1,25 +1,29 @@
 package com.sen.haoliyou.mode;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2016/5/5.
  */
-public class FragAssessmentHome {
+public class AssessmentItemBean implements Serializable {
+
 
     /**
-     * begin_date : 2016-05-03
+     * begin_date : 2016-05-04
      * con_ans : 0
      * con_de_user : 0
-     * de_flag : 4
-     * demand_id : 27338551557c416981e13a49fe5f168e
-     * demand_name : gsg
+     * de_flag : 5
+     * demand_id : a4b490e2afa74238939304a46613ccf3
+     * demand_name : ddsd
      * demand_user_type : 1
-     * end_date : 2016-05-24
+     * end_date : 2016-05-26
      * is_submit : 1
-     * leader_paper_info : dgsdg
-     * remark : dgsdg
-     * stu_paper_info : sdgs
+     * leader_paper_info : sdsds
+     * remark : sdsds
+     * stu_paper_info : sdsd
      * tc_id : 7c5c410da5a34c5e980eb205a966e4b4
      * tc_name : 111
+     * time_flag : 1
      */
 
     private String begin_date;
@@ -36,6 +40,7 @@ public class FragAssessmentHome {
     private String stu_paper_info;
     private String tc_id;
     private String tc_name;
+    private String time_flag;
 
     public String getBegin_date() {
         return begin_date;
@@ -147,5 +152,13 @@ public class FragAssessmentHome {
 
     public void setTc_name(String tc_name) {
         this.tc_name = tc_name;
+    }
+
+    public String getTime_flag() {
+        return time_flag;
+    }
+
+    public void setTime_flag(String time_flag) {
+        this.time_flag = time_flag;
     }
 }

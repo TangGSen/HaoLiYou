@@ -5,19 +5,20 @@ package com.sen.haoliyou.tools;
  */
 public class Constants {
     //腾讯 bugly
-    public static final String APPID= "900022459";
+    public static final String APPID = "900022459";
 
     //接口
 
     // 外网地址
-     public static final String PATH = "http://192.168.50.20/";
+//    public static final String PATH = "http://192.168.50.20/";
 //	 public static final String PATH = "http://sec.cncm.com.cn/";
 //    public static final String PATH = "http://111.202.9.28:15030/";
+    public static final String PATH = "http://119.57.68.35:15200/";
 //    public static final String PATH = "http://192.168.50.124/";
 
 
-//    1.app 更新
-public static final String APK_PATH = "http://139.129.8.158/www/resource/phoneDownload/android.html";
+    //    1.app 更新
+    public static final String APK_PATH = "http://139.129.8.158/www/resource/phoneDownload/android.html";
 
 
     // 1.登陆
@@ -92,9 +93,9 @@ public static final String APK_PATH = "http://139.129.8.158/www/resource/phoneDo
     // 参数3：content 类型：String 描述：评论内容
 
     //
-    public static final String PATH_PICTURE = PATH+"www/resource/lessonImg/";
-    public static final String PATH_PLAYER =  PATH+"www/resource/mp4Course/";
-    public static final String PATH_PORTRAIT =  PATH+"www/resource/user/images/";
+    public static final String PATH_PICTURE = PATH + "www/resource/lessonImg/";
+    public static final String PATH_PLAYER = PATH + "www/resource/mp4Course/";
+    public static final String PATH_PORTRAIT = PATH + "www/resource/user/images/";
 
     // 10. 获得论坛模块
     public static final String PATH_BBSList = "MobileServer/tbztBBSList";
@@ -130,4 +131,50 @@ public static final String APK_PATH = "http://139.129.8.158/www/resource/phoneDo
     // 4.获取试题
     public static final String PATH_ENTEREXAM = "MobileServer/EnterExam";
     public static final String PATH_SUBMITEXAM = "MobileServer/SubmitExam";
+/*
+*
+* 培训评估
+*
+* */
+    //评估列表
+    public static final String PATH_GETASSESSMENTS = "MobileServer/AssessmentList";
+//    参数：user_id  用户ID
+//    参数值类型：String
+
+    //下级人员列表
+    public static final String PATH_GETLOWEMPLOYEELISTS = "MobileServer/LowEmployeeList";
+//    参数：
+//    user_id 用户ID
+//    tc_id 培训班ID
+//    demand_id 评估ID
+//
+// 进入评估
+    public static final String PATH_ENTERDEMAND = "MobileServer/EnterDemand";
+//    参数：
+//    参数：demand_id  评估ID
+//    参数值类型：String
+
+    //提交评估
+ public static final String PATH_SUBMITDEMAND = "MobileServer/SubmitDemand";
+//    参数：
+//    user_id： 用户ID
+//    demand_id：评估ID
+//    template_id: 模板ID
+//    de_flag: 评估类型
+//    demand_user_type: 评估对象
+//    be_user_id：被评估的ID（领导评估时的学员ID，学员自评和满意度评估时，传“0”）
+//    answer（json格式）
+//    参数值类型：String
+//    返回值：{"success":"true"}
+
+
+
+
+
+
+
+
+
+
+
 }
