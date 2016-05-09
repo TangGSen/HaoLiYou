@@ -139,11 +139,13 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 } else {
                     // 操作：训前领导评估进入下级人员列表界面
+
                 }
                 break;
             case 5:
 
                 if ("1".equals(demand_user_type)) {
+
                 } else {
 
                 }

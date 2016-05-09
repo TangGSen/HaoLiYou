@@ -73,6 +73,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private static final int SUBMIT_ANSER_ERROR = 4;
     private static final String DEMAND_ID = "demand_id";
     private static final String ASSESS_NAME = "assess_name";
+    private static final int QUESTION_COUNT = 10;//选项总数
     private String demandId;
     private GestureDetector detector;
     @Bind(R.id.testing_tv_theme)
@@ -258,6 +259,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     public ActDoAssessHome parseNetworkResponse(Response response) throws Exception {
 
                         String string = response.body().string();
+                        Log.e("sen",string);
                         ActDoAssessHome lesssonBean = JSON.parseObject(string, ActDoAssessHome.class);
                         return lesssonBean;
                     }
@@ -310,7 +312,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     // 记录的答案,answerMap 第一个参数是选了没道题的哪一个选项，第二个是答案
     private HashMap<String, ExamUserAnswer> answerMap = new HashMap<String, ExamUserAnswer>();
 
-    private String[] answerToChose = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+   // private String[] answerToChose = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
     //ps:这样分组，因为我在点击保存 论述，简答 ，填空频繁需要题的类型，
     private int currtentType = -1;
@@ -460,7 +462,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             userAnswer.setAnswer(answer);
         } else {
             //待会修改
-          //  answerMap.put(key, new ExamUserAnswer(key, answer, question.getType()));
+            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type()));
         }
 
     }
@@ -472,7 +474,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         final String[] mMutilChoose = new String[size];
         for (int i = 0; i < size; i++) {
             final AppCompatCheckBox checkBox = new AppCompatCheckBox(ActDoAssess.this);
-            checkBox.setText(array_options[i].split("\\-")[1]);
+            final String[] answerAndQues = array_options[i].split("\\-");
+            checkBox.setText(answerAndQues[1]);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             checkBox.setPadding(0, 40, 0, 40);
             checkBox.setLayoutParams(params);
@@ -486,16 +489,23 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 @Override
                 public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
                     if (isChecked) {
-                        mMutilChoose[temp] = answerToChose[temp];
+                        mMutilChoose[temp] = answerAndQues[0];
                     } else {
                         mMutilChoose[temp] = null;
                     }
                     StringBuffer buffer = new StringBuffer();
-                    for (int j = 0; j < mMutilChoose.length; j++) {
-                        if (mMutilChoose[j] != null) {
-                            buffer.append(mMutilChoose[j]);
+                   int length = mMutilChoose.length;
+
+                        for (int j = 0; j < length; j++) {
+                            if (mMutilChoose[j] != null) {
+                                if (length>1 && j!=length-1){
+                                    buffer.append(mMutilChoose[j]+"|");
+                                }else {
+                                    buffer.append(mMutilChoose[j]);
+                                }
+
+                            }
                         }
-                    }
                     addToAnswer(currentNum, buffer.toString());
                 }
             });
@@ -540,8 +550,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     // 显示当前用户的答案
     private void showCurrentQuestion() {
         String key = questionLists.get(currentNum).getId();
+        String [] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
+
         ExamUserAnswer currentAnswer = answerMap.get(key);
-        int contTrue = answerToChose.length;
+
         if (currentAnswer == null) {
             return;
         }
@@ -554,8 +566,9 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             case 1:
                 //从缓存view中找回以前的父控件，这个很关键，要不崩溃的
                 radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
-                for (int i = 0; i < contTrue; i++) {
-                    if (userAnswerStr.equals(answerToChose[i])) {
+                for (int i = 0; i < QUESTION_COUNT; i++) {
+                    String checkedItem = quesitonAnawser[i].split("\\-")[0];
+                    if (userAnswerStr.equals(checkedItem)) {
                         AppCompatRadioButton childAt = (AppCompatRadioButton) radio_group_single.getChildAt(i);
                         childAt.setChecked(true);
                         break;
@@ -567,8 +580,9 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 char[] arraryAnswer = userAnswerStr.toCharArray();
                 int arryCount = arraryAnswer.length;
                 for (int y = 0; y < arryCount; y++) {
-                    for (int i = 0; i < contTrue; i++) {
-                        if (String.valueOf(arraryAnswer[y]).equals(answerToChose[i])) {
+                    for (int i = 0; i < QUESTION_COUNT; i++) {
+                        String checkedItem = quesitonAnawser[i].split("\\-")[0];
+                        if (String.valueOf(arraryAnswer[y]).equals(checkedItem)) {
                             AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(i);
                             childAt.setChecked(true);
                         }
@@ -703,9 +717,9 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String tipString = "";
         int notDo = questionLists.size() - answerMap.size();
         if (notDo == 0) {
-            tipString = "您正在考试，退出吗?";
+            tipString = "您正在评估，退出吗?";
         } else {
-            tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没做，退出吗?";
+            tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没评，退出吗?";
         }
         BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
@@ -798,12 +812,14 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             Toast.makeText(ActDoAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
             return;
         }
-        String url = Constants.PATH + Constants.PATH_SUBMITEXAM;
+        String url = Constants.PATH + Constants.PATH_SUBMITDEMAND;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("userid", AcountManager.getAcountId())
-                .addParams("demandId", demandId)
-                .addParams("paperid", paperId)
+                .addParams("user_id", AcountManager.getAcountId())
+                .addParams("demand_id", demandId)
+                .addParams("de_flag", "")
+                .addParams("demand_user_type", "")
+                .addParams("be_user_id", "0")
                 .addParams("answer", answer)
                 .build()
                 .execute(new Callback<Boolean>() {
