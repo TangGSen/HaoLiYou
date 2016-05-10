@@ -117,15 +117,15 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.ActItemAssessDetail"
+            android:name=".activity.assess.ActItemAssessDetail"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.ActDoAssess"
+            android:name=".activity.assess.ActDoAssess"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.ActEmployeeList"
+            android:name=".activity.assess.ActEmployeeList"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 

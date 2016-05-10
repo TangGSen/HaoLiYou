@@ -1,4 +1,4 @@
-package com.sen.haoliyou.activity;
+package com.sen.haoliyou.activity.assess;
 
 import android.content.Context;
 import android.content.Intent;

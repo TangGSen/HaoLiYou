@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.sen.haoliyou.R;
-import com.sen.haoliyou.activity.ActItemAssessDetail;
+import com.sen.haoliyou.activity.assess.ActItemAssessDetail;
 import com.sen.haoliyou.adapter.AssessmentListAdapter;
 import com.sen.haoliyou.base.BaseFragment;
 import com.sen.haoliyou.imgloader.AnimateFirstDisplayListener;
