@@ -46,7 +46,7 @@ public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_examlist_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employee_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
 
         return viewHolder;
@@ -57,7 +57,10 @@ public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.
 
         ActEmployeeHome.EmployeeItemBean itemBean = mData.get(position);
 
-        holder.tv_employee_name.setText(itemBean.getUser_name());
+        holder.tv_employee_name.setText(dealName(itemBean.getUser_name()));
+        holder.tv_group_name.setText("组织："+itemBean.getGroup_name());
+        holder.tv_organization.setText("部门："+itemBean.getOrganization());
+        holder.tv_station_name.setText("岗位："+itemBean.getStation_name());
 
         final int examType =Integer.parseInt(itemBean.getCheck_flag());
         String examTypeStr = "";
@@ -87,7 +90,25 @@ public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.
     }
 
 
+    //处理名字 大于4和时 +“\n”，超过三行以后就...，sorry 兄弟你的名字那么长，我也不忍心的
+    private String dealName(String name){
+        if (name.length()<4){
+            return name;
+        }else{
+          String [] string=  name.split("");
+            int length = string.length;
+            StringBuffer bur = new StringBuffer();
+            for (int i = 0; i < length; i++) {
+                if (i==4 || i==8){
+                    bur.append(string[i]+"\n");
+                }else {
+                    bur.append(string[i]);
+                }
+            }
+            return bur.toString();
+        }
 
+    }
 
 
 

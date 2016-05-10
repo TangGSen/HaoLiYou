@@ -134,6 +134,8 @@ public class ActItemAssessDetail extends BaseActivity {
             case 3:
 //                类型：满意度评估
 //                操作：进入答题界面
+                ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean.getDemand_id(),childItemBean.getDemand_name());
+
 
                 break;
             case 4:

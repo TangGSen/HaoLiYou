@@ -41,7 +41,7 @@ public class ActEmployeeHome implements Serializable {
         this.courseList = courseList;
     }
 
-    public  class EmployeeItemBean {
+    public  class EmployeeItemBean implements Serializable{
         private String check_flag;
         private String group_name;
         private String organization;

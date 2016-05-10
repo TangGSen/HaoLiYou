@@ -35,6 +35,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 import okhttp3.Call;
 import okhttp3.Request;
@@ -61,7 +62,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     private boolean isReFlesh = false;
     private List<ActEmployeeHome.EmployeeItemBean> examItemBeanList;
     private List<ActEmployeeHome.EmployeeItemBean> allExamItemBeanList;
-    private ActEmployeeAdapter examAdapter;
+    private ActEmployeeAdapter elopmyeeAdapter;
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -108,19 +109,25 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     private void showExamData(List<ActEmployeeHome.EmployeeItemBean> examItemBeanList) {
 
 
-        if (examAdapter == null) {
-            examAdapter = new ActEmployeeAdapter(ActEmployeeList.this, examItemBeanList);
-            mEmployeeRecylerview.setAdapter(examAdapter);
+        if (elopmyeeAdapter == null) {
+            elopmyeeAdapter = new ActEmployeeAdapter(ActEmployeeList.this, examItemBeanList);
+            mEmployeeRecylerview.setAdapter(elopmyeeAdapter);
         } else {
-            examAdapter.notifyDataSetChanged();
+            elopmyeeAdapter.notifyDataSetChanged();
         }
 
-        examAdapter.setOnItemClickListener(new ActEmployeeAdapter.OnItemClickListener() {
+        elopmyeeAdapter.setOnItemClickListener(new ActEmployeeAdapter.OnItemClickListener() {
 
 
             @Override
-            public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean CHILD_ITEMBEAN, int enterType) {
-                
+            public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean employeeItemBean, int enterType) {
+                if (enterType==0){
+                    //进入评估
+                    ActDoAssess.toThis(ActEmployeeList.this,child_itembean.getDemand_id(),child_itembean.getDemand_name());
+                }else{
+                    //进入查看
+
+                }
             }
         });
 
@@ -240,7 +247,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         //下拉刷新和加载更多就不用show
         if (!isReFlesh)
             DialogUtils.showDialog(ActEmployeeList.this, "请稍等");
-        String url = Constants.PATH + Constants.GETEXAM;
+        String url = Constants.PATH + Constants.PATH_GETLOW_EMPLOYEELISTS;
         OkHttpUtils.post()
                 .url(url)
                 .addParams("user_id", AcountManager.getAcountId())
@@ -298,6 +305,10 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     }
 
 
+    @OnClick(R.id.employee_back)
+    public void back(){
+        finish();
+    }
 
 
 }

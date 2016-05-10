@@ -142,7 +142,7 @@ public class Constants {
 //    参数值类型：String
 
     //下级人员列表
-    public static final String PATH_GETLOWEMPLOYEELISTS = "MobileServer/LowEmployeeList";
+    public static final String PATH_GETLOW_EMPLOYEELISTS = "MobileServer/LowEmployeeList";
 //    参数：
 //    user_id 用户ID
 //    tc_id 培训班ID

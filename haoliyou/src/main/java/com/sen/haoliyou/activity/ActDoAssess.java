@@ -550,7 +550,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     // 显示当前用户的答案
     private void showCurrentQuestion() {
         String key = questionLists.get(currentNum).getId();
-        String [] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
+
 
         ExamUserAnswer currentAnswer = answerMap.get(key);
 
@@ -564,6 +564,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
         switch (currtentType) {
             case 1:
+                String [] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
                 //从缓存view中找回以前的父控件，这个很关键，要不崩溃的
                 radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
                 for (int i = 0; i < QUESTION_COUNT; i++) {
@@ -576,12 +577,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 }
                 break;
             case 2:
+                String [] quesitonAnawsers = questionLists.get(currentNum).getOption().split("\\|");
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
                 char[] arraryAnswer = userAnswerStr.toCharArray();
                 int arryCount = arraryAnswer.length;
                 for (int y = 0; y < arryCount; y++) {
                     for (int i = 0; i < QUESTION_COUNT; i++) {
-                        String checkedItem = quesitonAnawser[i].split("\\-")[0];
+                        String checkedItem = quesitonAnawsers[i].split("\\-")[0];
                         if (String.valueOf(arraryAnswer[y]).equals(checkedItem)) {
                             AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(i);
                             childAt.setChecked(true);
