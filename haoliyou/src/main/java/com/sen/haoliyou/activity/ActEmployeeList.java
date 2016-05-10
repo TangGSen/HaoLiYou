@@ -1,5 +1,7 @@
 package com.sen.haoliyou.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +19,7 @@ import com.sen.haoliyou.R;
 import com.sen.haoliyou.adapter.ActEmployeeAdapter;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActEmployeeHome;
+import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
@@ -42,8 +45,10 @@ import okhttp3.Response;
  */
 public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-
+    private static final String CHILD_ITEM_BEAN = "child_itembean";
+    private static final String CHILDBUNDLE = "childBundle";
     private static final int GETDATA_ERROR = 0;
+    private AssessmentItemBean child_itembean;
     @Bind(R.id.employee_back)
     AppCompatTextView mEmployeeBack;
     @Bind(R.id.tab_test_name)
@@ -99,6 +104,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         }
     });
 
+
     private void showExamData(List<ActEmployeeHome.EmployeeItemBean> examItemBeanList) {
 
 
@@ -113,7 +119,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
 
 
             @Override
-            public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean childItemBean, int enterType) {
+            public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean CHILD_ITEMBEAN, int enterType) {
                 
             }
         });
@@ -131,6 +137,25 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+    }
+    public static void toThis(Context context, AssessmentItemBean child_itembean) {
+        Intent intent = new Intent(context, ActEmployeeList.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(CHILD_ITEM_BEAN,child_itembean);
+        intent.putExtra("childBundle",bundle);
+        context.startActivity(intent);
+    }
+
+
+
+    @Override
+    protected void init() {
+        super.init();
+        Intent intent = getIntent();
+        Bundle bundle = intent.getBundleExtra(CHILDBUNDLE);
+        child_itembean = (AssessmentItemBean) bundle.getSerializable(CHILD_ITEM_BEAN);
+
+
     }
 
     @Override
@@ -195,7 +220,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         allExamItemBeanList = new ArrayList<>();
-        if (isLoad) {
+        if (isLoad && child_itembean !=null) {
             getEmployeeListData();
         }
     }
@@ -218,7 +243,9 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         String url = Constants.PATH + Constants.GETEXAM;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("userid", AcountManager.getAcountId())
+                .addParams("user_id", AcountManager.getAcountId())
+                .addParams("tc_id", child_itembean.getTc_id())
+                .addParams("demand_id", child_itembean.getDemand_id())
                 .build()
                 .execute(new Callback<ActEmployeeHome>() {
                     @Override
@@ -269,4 +296,8 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
             }
         }, 1000);
     }
+
+
+
+
 }

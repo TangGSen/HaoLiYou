@@ -124,6 +124,10 @@
             android:name=".activity.ActDoAssess"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ActEmployeeList"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
 
         <!-- 下载相关的服务和provider -->
         <provider

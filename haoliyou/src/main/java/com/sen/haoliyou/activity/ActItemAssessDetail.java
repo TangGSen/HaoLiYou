@@ -131,26 +131,24 @@ public class ActItemAssessDetail extends BaseActivity {
         int de_flag = Integer.parseInt(childItemBean.getDe_flag());
         String demand_user_type = childItemBean.getDemand_user_type();
         switch (de_flag) {
+            case 3:
+//                类型：满意度评估
+//                操作：进入答题界面
+
+                break;
             case 4:
+
                 if ("1".equals(demand_user_type)) {
                     // 操作：训前学员评估直接进入答题界面
                     Log.e("sen",childItemBean.getDemand_id());
-                ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean.getDemand_id(),childItemBean.getDemand_name());
+                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean.getDemand_id(),childItemBean.getDemand_name());
 
                 } else {
                     // 操作：训前领导评估进入下级人员列表界面
-
+                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean);
                 }
                 break;
             case 5:
-
-                if ("1".equals(demand_user_type)) {
-
-                } else {
-
-                }
-                break;
-            case 6:
 
                 if ("1".equals(demand_user_type)) {
 
