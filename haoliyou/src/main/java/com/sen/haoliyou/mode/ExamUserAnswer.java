@@ -9,8 +9,17 @@ public class ExamUserAnswer implements Serializable {
     private String id;
     private String answer;
     private String type;
+    private String opinion;
 
-    public ExamUserAnswer(String id,String answer,String type){
+    public String getOpinion() {
+        return opinion;
+    }
+
+    public void setOpinion(String opinion) {
+        this.opinion = opinion;
+    }
+
+    public ExamUserAnswer(String id, String answer, String type){
         this.id = id;
         this.answer = answer;
         this.type = type;

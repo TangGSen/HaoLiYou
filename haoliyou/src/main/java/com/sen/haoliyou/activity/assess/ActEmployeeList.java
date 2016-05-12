@@ -60,6 +60,8 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     SwipeRefreshLayout mEmployeeSwipeRefreshWidget;
     private boolean isLoad = false;
     private boolean isReFlesh = false;
+
+    private boolean isAddOpinion;
     private List<ActEmployeeHome.EmployeeItemBean> examItemBeanList;
     private List<ActEmployeeHome.EmployeeItemBean> allExamItemBeanList;
     private ActEmployeeAdapter elopmyeeAdapter;
@@ -106,6 +108,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     });
 
 
+
     private void showExamData(List<ActEmployeeHome.EmployeeItemBean> examItemBeanList) {
 
 
@@ -122,8 +125,8 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
             @Override
             public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean employeeItemBean, int enterType) {
                 if (enterType==0){
-                    //进入评估
-                    ActDoAssess.toThis(ActEmployeeList.this,child_itembean.getDemand_id(),child_itembean.getDemand_name());
+                    //进入评估,传被评估的id
+                    ActDoAssess.toThis(ActEmployeeList.this,child_itembean,employeeItemBean.getUser_id(),isAddOpinion);
                 }else{
                     //进入查看
 
@@ -145,10 +148,11 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
     }
-    public static void toThis(Context context, AssessmentItemBean child_itembean) {
+    public static void toThis(Context context, AssessmentItemBean child_itembean, boolean isAddOpinion) {
         Intent intent = new Intent(context, ActEmployeeList.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(CHILD_ITEM_BEAN,child_itembean);
+        bundle.putBoolean("isAddOpinion",isAddOpinion);
         intent.putExtra("childBundle",bundle);
         context.startActivity(intent);
     }
@@ -161,6 +165,8 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra(CHILDBUNDLE);
         child_itembean = (AssessmentItemBean) bundle.getSerializable(CHILD_ITEM_BEAN);
+        isAddOpinion =bundle.getBoolean("isAddOpinion");
+
 
 
     }

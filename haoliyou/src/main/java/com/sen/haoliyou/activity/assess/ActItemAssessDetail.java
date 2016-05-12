@@ -134,7 +134,8 @@ public class ActItemAssessDetail extends BaseActivity {
             case 3:
 //                类型：满意度评估
 //                操作：进入答题界面
-                ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean.getDemand_id(),childItemBean.getDemand_name());
+//                领导评估时的学员ID；学员自评和满意度评估时，传“0” false,"0 双重保障
+                ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
 
 
                 break;
@@ -143,19 +144,28 @@ public class ActItemAssessDetail extends BaseActivity {
                 if ("1".equals(demand_user_type)) {
                     // 操作：训前学员评估直接进入答题界面
                     Log.e("sen",childItemBean.getDemand_id());
-                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean.getDemand_id(),childItemBean.getDemand_name());
+                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
 
                 } else {
                     // 操作：训前领导评估进入下级人员列表界面
-                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean);
+                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean,false);
                 }
                 break;
             case 5:
 
                 if ("1".equals(demand_user_type)) {
+                    // 操作：训后学员评估直接进入答题界面
+                    Log.e("sen",childItemBean.getDemand_id());
+                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
+
+
+
+
 
                 } else {
-
+                    // 操作：训后
+                    // 领导评估进入下级人员列表界面
+                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean,true);
                 }
                 break;
         }

@@ -10,6 +10,7 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -29,6 +30,7 @@ import com.alibaba.fastjson.JSON;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActDoAssessHome;
+import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventNoThing;
 import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
 import com.sen.haoliyou.mode.ExamAnswerJsonBean;
@@ -71,10 +73,14 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private static final int SHOW_DATA = 1;
     private static final int SUBMIT_ANSER_DEAL = 3;
     private static final int SUBMIT_ANSER_ERROR = 4;
-    private static final String DEMAND_ID = "demand_id";
-    private static final String ASSESS_NAME = "assess_name";
     private static final int QUESTION_COUNT = 10;//选项总数
-    private String demandId;
+    private static final String ASSESSMENT_ITEMBEAN = "assessment_itembean";
+    private static final String CHILD_BUNDLE = "child_bundle";
+    private static final String BE_USER_ID ="be_user_id";
+    private static final String IS_ADD_OPINION ="isAddOpinion";
+    private boolean isAddOpinion;
+    private String be_user_id;
+    private AssessmentItemBean mAssessmentItemBean;
     private GestureDetector detector;
     @Bind(R.id.testing_tv_theme)
     AppCompatTextView testing_tv_theme;
@@ -167,6 +173,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
     });
 
+
+
     private void showAnserSecess() {
         BaseDialogCumstorTip.getDefault().showOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
@@ -190,27 +198,36 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     }
 
-    public static void toThis(Context context, String demandId, String assessName) {
+    public static void toThis(Context context, AssessmentItemBean child_itembean, String be_user_id, boolean isAddOpinion) {
         Intent intent = new Intent(context, ActDoAssess.class);
-        intent.putExtra(DEMAND_ID, demandId);
-        intent.putExtra(ASSESS_NAME,assessName);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ASSESSMENT_ITEMBEAN, child_itembean);
+        bundle.putString(BE_USER_ID,be_user_id);
+        bundle.putBoolean(IS_ADD_OPINION,isAddOpinion);
+        intent.putExtra(CHILD_BUNDLE, bundle);
         context.startActivity(intent);
     }
+
 
     @Override
     protected void init() {
         super.init();
         Intent intent = getIntent();
-        demandId = intent.getStringExtra(DEMAND_ID);
-        assessName = intent.getStringExtra(ASSESS_NAME);
-        Log.e("sen",demandId);
-        if (assessName == null) {
-            assessName = "";
-        }
-        if (demandId == null) {
+        Bundle bundle = intent.getBundleExtra(CHILD_BUNDLE);
+        be_user_id = bundle.getString(BE_USER_ID);
+        isAddOpinion =bundle.getBoolean(IS_ADD_OPINION);
+
+
+        mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
+        if (mAssessmentItemBean == null) {
             Toast.makeText(ActDoAssess.this, "获取试题失败，请重试", Toast.LENGTH_SHORT).show();
             return;
         }
+        assessName = mAssessmentItemBean.getDemand_name();
+        if (TextUtils.isEmpty(assessName)) {
+            assessName = "";
+        }
+
     }
 
     @Override
@@ -243,11 +260,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             Toast.makeText(ActDoAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
             return;
         }
-        DialogUtils.showunCancleDialog(this,"请稍后");
+        DialogUtils.showunCancleDialog(this, "请稍后");
         String url = Constants.PATH + Constants.PATH_ENTERDEMAND;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("demand_id", demandId)
+                .addParams("demand_id", mAssessmentItemBean.getDemand_id())
                 .build()
                 .execute(new Callback<ActDoAssessHome>() {
                     @Override
@@ -259,7 +276,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     public ActDoAssessHome parseNetworkResponse(Response response) throws Exception {
 
                         String string = response.body().string();
-                        Log.e("sen",string);
+                        Log.e("sen", string);
                         ActDoAssessHome lesssonBean = JSON.parseObject(string, ActDoAssessHome.class);
                         return lesssonBean;
                     }
@@ -312,13 +329,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     // 记录的答案,answerMap 第一个参数是选了没道题的哪一个选项，第二个是答案
     private HashMap<String, ExamUserAnswer> answerMap = new HashMap<String, ExamUserAnswer>();
 
-   // private String[] answerToChose = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+    // private String[] answerToChose = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
     //ps:这样分组，因为我在点击保存 论述，简答 ，填空频繁需要题的类型，
     private int currtentType = -1;
 
     private void setQuestionType(String type) {
-        if ("1".equals(type) ) {
+        if ("1".equals(type)) {
             currtentType = 1;
         } else if ("2".equals(type)) {
             currtentType = 2;
@@ -333,7 +350,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         //先在ViewChace 找，如果能找到
         //显示大标题
         ActDoAssessHome.QuListBean questionItem = questionLists.get(currentNum);
-        String bitTile =questionItem.getBig_title();
+        String bitTile = questionItem.getBig_title();
         String typeQuestion = questionItem.getTerm_type();
         setQuestionType(typeQuestion);
         View view = null;
@@ -351,7 +368,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
         String options_show = questionLists.get(currentNum).getOption();
 
-        String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title() ;
+        String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title();
         tv_test_title.setText(tv_question_string);
 
         if (currtentType == 1) {
@@ -412,8 +429,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         });
         layout_other_type_exam.addView(edit);
     }
-
-
 
 
     //显示单选题
@@ -494,18 +509,18 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                         mMutilChoose[temp] = null;
                     }
                     StringBuffer buffer = new StringBuffer();
-                   int length = mMutilChoose.length;
+                    int length = mMutilChoose.length;
 
-                        for (int j = 0; j < length; j++) {
-                            if (mMutilChoose[j] != null) {
-                                if (length>1 && j!=length-1){
-                                    buffer.append(mMutilChoose[j]+"|");
-                                }else {
-                                    buffer.append(mMutilChoose[j]);
-                                }
-
+                    for (int j = 0; j < length; j++) {
+                        if (mMutilChoose[j] != null) {
+                            if (length > 1 && j != length - 1) {
+                                buffer.append(mMutilChoose[j] + "|");
+                            } else {
+                                buffer.append(mMutilChoose[j]);
                             }
+
                         }
+                    }
                     addToAnswer(currentNum, buffer.toString());
                 }
             });
@@ -526,7 +541,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             exam_viewflipper.showNext();
         }
     }
-
 
 
     private void showPreQuestion() {
@@ -564,7 +578,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
         switch (currtentType) {
             case 1:
-                String [] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
+                String[] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
                 //从缓存view中找回以前的父控件，这个很关键，要不崩溃的
                 radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
                 for (int i = 0; i < QUESTION_COUNT; i++) {
@@ -577,7 +591,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 }
                 break;
             case 2:
-                String [] quesitonAnawsers = questionLists.get(currentNum).getOption().split("\\|");
+                String[] quesitonAnawsers = questionLists.get(currentNum).getOption().split("\\|");
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
                 char[] arraryAnswer = userAnswerStr.toCharArray();
                 int arryCount = arraryAnswer.length;
@@ -634,7 +648,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     @Override
     public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3) {
-        Log.e("sen", arg2 + "————————" + arg3);
         return false;
     }
 
@@ -796,6 +809,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 jsonBean.setAnswer(examUserAnswers);
 
                 String jsonString = JSON.toJSONString(jsonBean);
+
+
                 Log.e("sen", jsonString);
                 Message message = Message.obtain();
                 message.obj = jsonString;
@@ -818,10 +833,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         OkHttpUtils.post()
                 .url(url)
                 .addParams("user_id", AcountManager.getAcountId())
-                .addParams("demand_id", demandId)
-                .addParams("de_flag", "")
-                .addParams("demand_user_type", "")
-                .addParams("be_user_id", "0")
+                .addParams("demand_id", mAssessmentItemBean.getDemand_id())
+                .addParams("de_flag", mAssessmentItemBean.getDe_flag())
+                .addParams("template_id", questionLists.get(0).getTemplate_id())
+                .addParams("demand_user_type", mAssessmentItemBean.getDemand_user_type())
+                .addParams("be_user_id", be_user_id)
                 .addParams("answer", answer)
                 .build()
                 .execute(new Callback<Boolean>() {
@@ -833,6 +849,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     @Override
                     public Boolean parseNetworkResponse(Response response) throws Exception {
                         String string = response.body().string();
+                        Log.e("sen",string);
                         Boolean success = JSON.parseObject(string).getBoolean("success");
                         if (success != null && success) {
                             return true;
