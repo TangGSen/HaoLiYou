@@ -19,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -82,6 +83,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private String be_user_id;
     private AssessmentItemBean mAssessmentItemBean;
     private GestureDetector detector;
+
     @Bind(R.id.testing_tv_theme)
     AppCompatTextView testing_tv_theme;
     @Bind(R.id.testing_imgbtn_close)
@@ -356,13 +358,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         View view = null;
         view = viewChace.get(questionLists.get(currentNum).getId());
         if (view != null) {
-            Log.e("sen", "存在view" + currentNum + 1);
+//            Log.e("sen", "存在view" + currentNum + 1);
             return view;
         }
-        Log.e("sen", "新建view" + currentNum + 1);
+//        Log.e("sen", "新建view" + currentNum + 1);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.viewflipper_test, null);
-
+       LinearLayout root_viewflipper_layout =(LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
         tv_test_title = (AppCompatTextView) view.findViewById(R.id.tv_test_title);
         radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
@@ -372,11 +374,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         tv_test_title.setText(tv_question_string);
 
         if (currtentType == 1) {
-            showSingleChoose(currentNum, options_show, radio_group_single);
+            showSingleChoose(currentNum, options_show, radio_group_single,root_viewflipper_layout);
         } else if (currtentType == 2) {
-            showMutileChoose(currentNum, options_show, layout_other_type_exam);
+            showMutileChoose(currentNum, options_show, layout_other_type_exam,root_viewflipper_layout);
         } else if (currtentType == 3) {
-            showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam);
+            showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam,root_viewflipper_layout);
         }
         addViewChace(questionLists.get(currentNum).getId(), view);
 
@@ -399,8 +401,38 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         viewChace.put(key, view);
     }
 
+    //创建EditeText
+    private void createEditTextView(ViewGroup parentView){
+        AppCompatEditText edit = new AppCompatEditText(this);
+        parentView.addView(edit);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
+        edit.setLayoutParams(params);
+        edit.setGravity(Gravity.LEFT);
+        edit.setTextSize(15);
+        edit.setPadding(16, 16, 16, 16);
+        edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
+        params.setMargins(0, 32, 0, 32);
+        edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
+        edit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+             //   addToAnswer(currentNum, s.toString());
+            }
+        });
+    }
+
     //论述和简答题
-    private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam) {
+    private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
         showVisbityAble(false, true);
         AppCompatEditText edit = new AppCompatEditText(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
@@ -432,10 +464,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
 
     //显示单选题
-    private void showSingleChoose(final int currentNum, String options, RadioGroup radioGroup) {
+    private void showSingleChoose(final int currentNum, String options, RadioGroup radioGroup, LinearLayout root_viewflipper_layout) {
         showVisbityAble(true, false);
         String[] array_options = options.split("\\|");
         createChooseView(array_options, radioGroup);
+        if (isAddOpinion){
+            createEditTextView(root_viewflipper_layout);
+        }
     }
 
     //把题分成两类，1单选，判断   2.多选，填空，简答，论述
@@ -482,7 +517,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     }
 
-    private void showMutileChoose(final int currentNum, String options, LinearLayout layout) {
+    private void showMutileChoose(final int currentNum, String options, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
         showVisbityAble(false, false);
         String[] array_options = options.split("\\|");
         int size = array_options.length;
