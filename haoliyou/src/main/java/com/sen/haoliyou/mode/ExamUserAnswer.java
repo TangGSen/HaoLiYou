@@ -19,11 +19,16 @@ public class ExamUserAnswer implements Serializable {
         this.opinion = opinion;
     }
 
-    public ExamUserAnswer(String id, String answer, String type){
+    public ExamUserAnswer(String id, String answer, String type) {
         this.id = id;
         this.answer = answer;
         this.type = type;
     }
+
+    public ExamUserAnswer() {
+
+    }
+
 
     public String getAnswer() {
         return answer;

@@ -409,7 +409,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         edit.setGravity(Gravity.LEFT);
         edit.setTextSize(15);
         edit.setHint("请写下辅导意见");
-        edit.setHintTextColor(ResourcesUtils.getResColor(ActDoAssess.this,R.color.font_h2));
+        edit.setHintTextColor(ResourcesUtils.getResColor(ActDoAssess.this, R.color.font_h2));
         edit.setPadding(16, 16, 16, 16);
         edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
         params.setMargins(32, 32, 32, 32);
@@ -427,10 +427,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
             @Override
             public void afterTextChanged(Editable s) {
-                //   addToAnswer(currentNum, s.toString());
+                addOptionToAnswer(currentNum, s.toString());
             }
         });
     }
+
 
     //论述和简答题
     private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
@@ -507,14 +508,31 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
     }
 
+    //保存训后领导评估的意见
+    private void addOptionToAnswer(int currentNum, String s) {
+        ActDoAssessHome.QuListBean question = questionLists.get(currentNum);
+        String key = question.getId();
+        if (answerMap.containsKey(key)) {
+
+            ExamUserAnswer userAnswer = answerMap.get(key);
+            userAnswer.setOpinion(s);
+        } else {
+            ExamUserAnswer userAnswer = new ExamUserAnswer();
+            userAnswer.setId(key);
+            userAnswer.setType(question.getTerm_type());
+            userAnswer.setOpinion(s);
+            answerMap.put(key, userAnswer);
+        }
+    }
+
     private void addToAnswer(int currentNum, String answer) {
         ActDoAssessHome.QuListBean question = questionLists.get(currentNum);
         String key = question.getId();
         if (answerMap.containsKey(key)) {
+
             ExamUserAnswer userAnswer = answerMap.get(key);
             userAnswer.setAnswer(answer);
         } else {
-            //待会修改
             answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type()));
         }
 
@@ -606,7 +624,9 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String key = questionLists.get(currentNum).getId();
 
 
+
         ExamUserAnswer currentAnswer = answerMap.get(key);
+
 
         if (currentAnswer == null) {
             return;
@@ -616,12 +636,25 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         if (userAnswerStr == null) {
             return;
         }
+        //把训后的意见也要找到并显示
+        if(isAddOpinion){
+          String userStr =  currentAnswer.getOpinion();
+          LinearLayout rootView = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
+          AppCompatEditText et = (AppCompatEditText) rootView.getChildAt(1);
+           if (TextUtils.isEmpty(userStr)) {
+               et.setText(userStr);
+           }else{
+               et.setText("");
+           }
+
+        }
         switch (currtentType) {
             case 1:
                 String[] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
                 //从缓存view中找回以前的父控件，这个很关键，要不崩溃的
                 radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
-                for (int i = 0; i < QUESTION_COUNT; i++) {
+                int ques = quesitonAnawser.length;
+                for (int i = 0; i < ques; i++) {
                     String checkedItem = quesitonAnawser[i].split("\\-")[0];
                     if (userAnswerStr.equals(checkedItem)) {
                         AppCompatRadioButton childAt = (AppCompatRadioButton) radio_group_single.getChildAt(i);
@@ -633,18 +666,23 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             case 2:
                 String[] quesitonAnawsers = questionLists.get(currentNum).getOption().split("\\|");
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
-                char[] arraryAnswer = userAnswerStr.toCharArray();
-                int arryCount = arraryAnswer.length;
-                for (int y = 0; y < arryCount; y++) {
-                    for (int i = 0; i < QUESTION_COUNT; i++) {
-                        String checkedItem = quesitonAnawsers[i].split("\\-")[0];
-                        if (String.valueOf(arraryAnswer[y]).equals(checkedItem)) {
-                            AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(i);
+                //用户的多选题是用 | 分割的
+                String[] userAns = userAnswerStr.split("\\|");
+                int questions = quesitonAnawsers.length;
+
+                int userQues = userAns.length;
+                Log.e("sen",questions+"___user"+userQues);
+                for (int y = 0; y < questions; y++) {
+                    for (int i = 0; i < userQues; i++) {
+
+                        Log.e("sen",y+"___u"+i);
+                        String checkedItem = quesitonAnawsers[y].split("\\-")[0];
+                        if (userAns[i].equals(checkedItem)) {
+                            AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(y);
                             childAt.setChecked(true);
                         }
                     }
                 }
-
                 break;
             case 3:
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
@@ -872,7 +910,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String url = Constants.PATH + Constants.PATH_SUBMITDEMAND;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("user_id", AcountManager.getAcountId())
+                .addParams("user_id1", AcountManager.getAcountId())
                 .addParams("demand_id", mAssessmentItemBean.getDemand_id())
                 .addParams("de_flag", mAssessmentItemBean.getDe_flag())
                 .addParams("template_id", questionLists.get(0).getTemplate_id())
