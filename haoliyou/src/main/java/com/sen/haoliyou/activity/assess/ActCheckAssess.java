@@ -511,9 +511,10 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
             String userStr = questionLists.get(currentNum).getOpinion();
             AppCompatEditText et = (AppCompatEditText)findViewById(R.id.et_assess_lead);
             if (TextUtils.isEmpty(userStr)) {
-                et.setText(userStr);
-            } else {
                 et.setText("");
+            } else {
+                et.setText(userStr);
+
             }
 
         }

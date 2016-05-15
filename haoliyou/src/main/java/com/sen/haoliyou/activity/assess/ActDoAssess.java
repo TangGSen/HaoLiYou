@@ -641,9 +641,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
           LinearLayout rootView = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
           AppCompatEditText et = (AppCompatEditText) rootView.getChildAt(1);
            if (TextUtils.isEmpty(userStr)) {
-               et.setText(userStr);
-           }else{
                et.setText("");
+           }else{
+               et.setText(userStr+"wodfjiodfji我耳机丰富等级积分的低价爱打架覅几点几分的房间爱京东方骄傲地方奥飞就傲娇地方就傲娇都放假啊大家覅大姐夫爱打架覅基地附近都金佛安静的纠纷及爱恋大方几点几房间爱多久佛奥绝地反击爱的发家具的房间爱降低房价降低房价降低房价埃及法第九法拉第辅导大家覅基地附近安静的覅啊的肌肤及埃及地方敬爱的及覅大家覅加剧地方");
+
            }
 
         }
@@ -686,7 +687,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             case 3:
                 layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
                 AppCompatEditText child = (AppCompatEditText) layout_other_type_exam.getChildAt(0);
-                child.setText(userAnswerStr);
+                child.setText(userAnswerStr+"wodfjiodfji我耳机丰富等级积分的低价爱打架覅几点几分的房间爱京东方骄傲地方奥飞就傲娇地方就傲娇都放假啊大家覅大姐夫爱打架覅基地附近都金佛安静的纠纷及爱恋大方几点几房间爱多久佛奥绝地反击爱的发家具的房间爱降低房价降低房价降低房价埃及法第九法拉第辅导大家覅基地附近安静的覅啊的肌肤及埃及地方敬爱的及覅大家覅加剧地方");
                 break;
 
         }
