@@ -166,6 +166,17 @@ public class Constants {
 //    answer（json格式）
 //    参数值类型：String
 //    返回值：{"success":"true"}
+      //提交评估
+ public static final String PATH_CHECKDEMAND = "MobileServer/CheckDemand";
+//    参数：
+//    user_id： 用户ID
+//    demand_id：评估ID
+//    be_user_id：被评估的ID（领导评估时的学员ID，学员自评和满意度评估时，传“0”）
+//    参数值类型：String
+
+
+
+
 
 
 

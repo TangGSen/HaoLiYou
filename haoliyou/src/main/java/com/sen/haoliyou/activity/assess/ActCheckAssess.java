@@ -9,9 +9,7 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -19,9 +17,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -30,28 +26,22 @@ import android.widget.ViewFlipper;
 import com.alibaba.fastjson.JSON;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
-import com.sen.haoliyou.mode.ActDoAssessHome;
+import com.sen.haoliyou.mode.ActCheckAssessHome;
 import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventNoThing;
-import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
-import com.sen.haoliyou.mode.ExamAnswerJsonBean;
 import com.sen.haoliyou.mode.ExamUserAnswer;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
 import com.sen.haoliyou.tools.DialogUtils;
 import com.sen.haoliyou.tools.NetUtil;
 import com.sen.haoliyou.tools.ResourcesUtils;
-import com.sen.haoliyou.widget.BaseDialogCumstorTip;
-import com.sen.haoliyou.widget.CustomerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import butterknife.Bind;
@@ -65,7 +55,7 @@ import okhttp3.Response;
 /**
  * Created by Administrator on 2016/3/11.
  */
-public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestureListener {
+public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGestureListener {
 
     private static final int SUBMIT_ANSWER_DATA = 2;
     private static final int SHOW_DATA_LEFTBTN_CLICK = 5;
@@ -82,7 +72,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private String be_user_id;
     private AssessmentItemBean mAssessmentItemBean;
     private GestureDetector detector;
-
     @Bind(R.id.testing_tv_theme)
     AppCompatTextView testing_tv_theme;
     @Bind(R.id.testing_imgbtn_close)
@@ -104,33 +93,32 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private int allQusSize;
 
 
-    private List<ActDoAssessHome.QuListBean> questionLists;
+    private List<ActCheckAssessHome.QuListBean> questionLists;
     private final int viewChaceSize = 3;
     private LinkedHashMap<String, View> viewChace = new LinkedHashMap<>();
-    private String paperId;
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
 
-                    Toast.makeText(ActDoAssess.this, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActCheckAssess.this, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
 
-                    ActDoAssessHome homeBeam = (ActDoAssessHome) msg.obj;
+                    ActCheckAssessHome homeBeam = (ActCheckAssessHome) msg.obj;
 
                     questionLists = homeBeam.getQu_list();
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActCheckAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActCheckAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                     settingBtnAble(true);
@@ -139,26 +127,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
 
                 case 2:
-                    String json = (String) msg.obj;
-                    submitUserAnswer(json);
+
                     break;
                 case 3:
-                    Boolean isSesscess = (Boolean) msg.obj;
-                    if (isSesscess) {
-                        Toast.makeText(ActDoAssess.this, "提交成功", Toast.LENGTH_SHORT).show();
-                        settingBtnAble(false);
-                        questionLists.clear();
-                        viewChace.clear();
-                        showAnserSecess();
 
-                    } else {
-                        setSubmitTestBtn(true);
-                        Toast.makeText(ActDoAssess.this, "提交失败,请重新交卷", Toast.LENGTH_SHORT).show();
-                    }
                     break;
                 case 4:
-                    setSubmitTestBtn(true);
-                    Toast.makeText(ActDoAssess.this, "提交失败,请重新交卷", Toast.LENGTH_SHORT).show();
                     break;
                 case 5:
                     showPreQuestion();
@@ -175,21 +149,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     });
 
 
-    private void showAnserSecess() {
-        BaseDialogCumstorTip.getDefault().showOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-            @Override
-            public void onLeftButtonClick(CustomerDialog dialog) {
-                EventBus.getDefault().post(new EventSubmitAnswerSucess());
-                exitTest();
-            }
-
-            @Override
-            public void onRigthButtonClick(CustomerDialog dialog) {
-
-            }
-        }, 260, 160, ActDoAssess.this, "提交成功", "待考试成绩公布后，您可去PC端查看!", "确定", true, true);
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -199,7 +158,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     }
 
     public static void toThis(Context context, AssessmentItemBean child_itembean, String be_user_id, boolean isAddOpinion) {
-        Intent intent = new Intent(context, ActDoAssess.class);
+        Intent intent = new Intent(context, ActCheckAssess.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ASSESSMENT_ITEMBEAN, child_itembean);
         bundle.putString(BE_USER_ID, be_user_id);
@@ -220,7 +179,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
         mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
         if (mAssessmentItemBean == null) {
-            Toast.makeText(ActDoAssess.this, "获取试题失败，请重试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActCheckAssess.this, "获取试题失败，请重试", Toast.LENGTH_SHORT).show();
             return;
         }
         assessName = mAssessmentItemBean.getDemand_name();
@@ -234,10 +193,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         setContentView(R.layout.activity_enter_exam_testing);
-        detector = new GestureDetector(ActDoAssess.this, this);
+        detector = new GestureDetector(ActCheckAssess.this, this);
         ButterKnife.bind(this);
         settingBtnAble(false);
         testing_tv_theme.setText(assessName);
+        image_submit_result.setVisibility(View.GONE);
 
     }
 
@@ -257,27 +217,29 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     public void getAssessData() {
         if (!NetUtil.isNetworkConnected(this)) {
-            Toast.makeText(ActDoAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActCheckAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
             return;
         }
         DialogUtils.showunCancleDialog(this, "请稍后");
-        String url = Constants.PATH + Constants.PATH_ENTERDEMAND;
+        String url = Constants.PATH + Constants.PATH_CHECKDEMAND;
         OkHttpUtils.post()
                 .url(url)
+                .addParams("user_id", AcountManager.getAcountId())
                 .addParams("demand_id", mAssessmentItemBean.getDemand_id())
+                .addParams("be_user_id", be_user_id)
                 .build()
-                .execute(new Callback<ActDoAssessHome>() {
+                .execute(new Callback<ActCheckAssessHome>() {
                     @Override
                     public void onBefore(Request request) {
                         super.onBefore(request);
                     }
 
                     @Override
-                    public ActDoAssessHome parseNetworkResponse(Response response) throws Exception {
+                    public ActCheckAssessHome parseNetworkResponse(Response response) throws Exception {
 
                         String string = response.body().string();
                         Log.e("sen", string);
-                        ActDoAssessHome lesssonBean = JSON.parseObject(string, ActDoAssessHome.class);
+                        ActCheckAssessHome lesssonBean = JSON.parseObject(string, ActCheckAssessHome.class);
                         return lesssonBean;
                     }
 
@@ -288,7 +250,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     }
 
                     @Override
-                    public void onResponse(ActDoAssessHome homeBeam) {
+                    public void onResponse(ActCheckAssessHome homeBeam) {
                         Message message = Message.obtain();
                         message.obj = homeBeam;
                         message.what = SHOW_DATA;
@@ -329,7 +291,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     // 记录的答案,answerMap 第一个参数是选了没道题的哪一个选项，第二个是答案
     private HashMap<String, ExamUserAnswer> answerMap = new HashMap<String, ExamUserAnswer>();
 
-    // private String[] answerToChose = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
     //ps:这样分组，因为我在点击保存 论述，简答 ，填空频繁需要题的类型，
     private int currtentType = -1;
@@ -349,7 +310,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         // 找控件（viewflipper里的所有控件）
         //先在ViewChace 找，如果能找到
         //显示大标题
-        ActDoAssessHome.QuListBean questionItem = questionLists.get(currentNum);
+        ActCheckAssessHome.QuListBean questionItem = questionLists.get(currentNum);
         String bitTile = questionItem.getBig_title();
         String typeQuestion = questionItem.getTerm_type();
         setQuestionType(typeQuestion);
@@ -361,11 +322,18 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
 //        Log.e("sen", "新建view" + currentNum + 1);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.viewflipper_test, null);
+        view = inflater.inflate(R.layout.viewflipper_assess, null);
         LinearLayout root_viewflipper_layout = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
         tv_test_title = (AppCompatTextView) view.findViewById(R.id.tv_test_title);
         radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
+        AppCompatEditText et_assess_lead = (AppCompatEditText) view.findViewById(R.id.et_assess_lead);
+        et_assess_lead.setEnabled(false);
+        if (isAddOpinion){
+            et_assess_lead.setVisibility(View.VISIBLE);
+        }else {
+            et_assess_lead.setVisibility(View.GONE);
+        }
         String options_show = questionLists.get(currentNum).getOption();
 
         String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title();
@@ -378,6 +346,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         } else if (currtentType == 3) {
             showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam, root_viewflipper_layout);
         }
+
+
         addViewChace(questionLists.get(currentNum).getId(), view);
 
         return view;
@@ -399,43 +369,29 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         viewChace.put(key, view);
     }
 
-    //创建EditeText
-    private void createEditTextView(ViewGroup parentView) {
-        AppCompatEditText edit = new AppCompatEditText(this);
-        parentView.addView(edit);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
-        edit.setLayoutParams(params);
-        edit.setGravity(Gravity.LEFT);
-        edit.setTextSize(15);
-        edit.setHint("请写下辅导意见");
-        edit.setHintTextColor(ResourcesUtils.getResColor(ActDoAssess.this, R.color.font_h2));
-        edit.setPadding(16, 16, 16, 16);
-        edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
-        params.setMargins(32, 32, 32, 32);
-        edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
-        edit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                addOptionToAnswer(currentNum, s.toString());
-            }
-        });
-    }
+//    //创建EditeText
+//    private void createEditTextView(ViewGroup parentView) {
+//        AppCompatEditText edit = new AppCompatEditText(this);
+//        parentView.addView(edit);
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
+//        edit.setLayoutParams(params);
+//        edit.setGravity(Gravity.LEFT);
+//        edit.setTextSize(15);
+//        edit.setHint("请写下辅导意见");
+//        edit.setHintTextColor(ResourcesUtils.getResColor(ActCheckAssess.this, R.color.font_h2));
+//        edit.setPadding(16, 16, 16, 16);
+//        edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
+//        params.setMargins(32, 32, 32, 32);
+//        edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
+//
+//    }
 
 
     //论述和简答题
     private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
         showVisbityAble(false, true);
         AppCompatEditText edit = new AppCompatEditText(this);
+        edit.setEnabled(false);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
         edit.setLayoutParams(params);
         edit.setGravity(Gravity.LEFT);
@@ -444,26 +400,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
         params.setMargins(0, 32, 0, 32);
         edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
-        if (isAddOpinion)
-            createEditTextView(root_viewflipper_layout);
-        edit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                addToAnswer(currentNum, s.toString());
-            }
-        });
         layout_other_type_exam.addView(edit);
     }
+
 
 
     //显示单选题
@@ -471,9 +412,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         showVisbityAble(true, false);
         String[] array_options = options.split("\\|");
         createChooseView(array_options, radioGroup);
-        if (isAddOpinion) {
-            createEditTextView(root_viewflipper_layout);
-        }
+
     }
 
     //把题分成两类，1单选，判断   2.多选，填空，简答，论述
@@ -485,7 +424,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private void createChooseView(String[] options, RadioGroup radioGroup) {
         int size = options.length;
         for (int i = 0; i < size; i++) {
-            final AppCompatRadioButton radioButton = new AppCompatRadioButton(ActDoAssess.this);
+            final AppCompatRadioButton radioButton = new AppCompatRadioButton(ActCheckAssess.this);
+            radioButton.setEnabled(false);
             final String[] idAndQestion = options[i].split("\\-");
             radioButton.setText(idAndQestion[1]);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -496,46 +436,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             radioButton.setTextSize(14);
             radioButton.setButtonDrawable(R.drawable.seletor_single_choose_exam);
             final int temp = i;
-            radioButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View arg0) {
 
-                    addToAnswer(currentNum, idAndQestion[0]);
-
-                }
-            });
         }
     }
 
-    //保存训后领导评估的意见
-    private void addOptionToAnswer(int currentNum, String s) {
-        ActDoAssessHome.QuListBean question = questionLists.get(currentNum);
-        String key = question.getId();
-        if (answerMap.containsKey(key)) {
-
-            ExamUserAnswer userAnswer = answerMap.get(key);
-            userAnswer.setOpinion(s);
-        } else {
-            ExamUserAnswer userAnswer = new ExamUserAnswer();
-            userAnswer.setId(key);
-            userAnswer.setType(question.getTerm_type());
-            userAnswer.setOpinion(s);
-            answerMap.put(key, userAnswer);
-        }
-    }
-
-    private void addToAnswer(int currentNum, String answer) {
-        ActDoAssessHome.QuListBean question = questionLists.get(currentNum);
-        String key = question.getId();
-        if (answerMap.containsKey(key)) {
-
-            ExamUserAnswer userAnswer = answerMap.get(key);
-            userAnswer.setAnswer(answer);
-        } else {
-            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type()));
-        }
-
-    }
 
     private void showMutileChoose(final int currentNum, String options, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
         showVisbityAble(false, false);
@@ -543,9 +447,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         int size = array_options.length;
         final String[] mMutilChoose = new String[size];
         for (int i = 0; i < size; i++) {
-            final AppCompatCheckBox checkBox = new AppCompatCheckBox(ActDoAssess.this);
+            final AppCompatCheckBox checkBox = new AppCompatCheckBox(ActCheckAssess.this);
             final String[] answerAndQues = array_options[i].split("\\-");
             checkBox.setText(answerAndQues[1]);
+            checkBox.setEnabled(false);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             checkBox.setPadding(0, 40, 0, 40);
             checkBox.setLayoutParams(params);
@@ -554,34 +459,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             checkBox.setButtonDrawable(R.drawable.down_checkbos_style);
             layout_other_type_exam.addView(checkBox);
             final int temp = i;
-
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
-                    if (isChecked) {
-                        mMutilChoose[temp] = answerAndQues[0];
-                    } else {
-                        mMutilChoose[temp] = null;
-                    }
-                    StringBuffer buffer = new StringBuffer();
-                    int length = mMutilChoose.length;
-
-                    for (int j = 0; j < length; j++) {
-                        if (mMutilChoose[j] != null) {
-                            if (length > 1 && j != length - 1) {
-                                buffer.append(mMutilChoose[j] + "|");
-                            } else {
-                                buffer.append(mMutilChoose[j]);
-                            }
-
-                        }
-                    }
-                    addToAnswer(currentNum, buffer.toString());
-                }
-            });
         }
-        if (isAddOpinion)
-            createEditTextView(root_viewflipper_layout);
+
     }
 
     private void showNextQuestion() {
@@ -590,7 +469,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum++;
         if (currentNum > allQusSize - 1) {
             currentNum = allQusSize - 1;
-            Toast.makeText(ActDoAssess.this, "已经是最后一题啦", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActCheckAssess.this, "已经是最后一题啦", Toast.LENGTH_SHORT).show();
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -608,7 +487,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum--;
         if (currentNum < 0) {
             currentNum = 0;
-            Toast.makeText(ActDoAssess.this, "已经是第一题了", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActCheckAssess.this, "已经是第一题了", Toast.LENGTH_SHORT).show();
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -622,29 +501,20 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private void showCurrentQuestion() {
         String key = questionLists.get(currentNum).getId();
 
-
-
-        ExamUserAnswer currentAnswer = answerMap.get(key);
-
-
-        if (currentAnswer == null) {
-            return;
-        }
         View view = viewChace.get(key);
-        String userAnswerStr = currentAnswer.getAnswer();
+        String userAnswerStr =  questionLists.get(currentNum).getAnswer();
         if (userAnswerStr == null) {
             return;
         }
         //把训后的意见也要找到并显示
-        if(isAddOpinion){
-          String userStr =  currentAnswer.getOpinion();
-          LinearLayout rootView = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
-          AppCompatEditText et = (AppCompatEditText) rootView.getChildAt(1);
-           if (TextUtils.isEmpty(userStr)) {
-               et.setText(userStr);
-           }else{
-               et.setText("");
-           }
+        if (isAddOpinion) {
+            String userStr = questionLists.get(currentNum).getOpinion();
+            AppCompatEditText et = (AppCompatEditText)findViewById(R.id.et_assess_lead);
+            if (TextUtils.isEmpty(userStr)) {
+                et.setText(userStr);
+            } else {
+                et.setText("");
+            }
 
         }
         switch (currtentType) {
@@ -670,11 +540,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 int questions = quesitonAnawsers.length;
 
                 int userQues = userAns.length;
-                Log.e("sen",questions+"___user"+userQues);
                 for (int y = 0; y < questions; y++) {
+
                     for (int i = 0; i < userQues; i++) {
 
-                        Log.e("sen",y+"___u"+i);
                         String checkedItem = quesitonAnawsers[y].split("\\-")[0];
                         if (userAns[i].equals(checkedItem)) {
                             AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(y);
@@ -741,7 +610,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            checkDataAndExit();
+            finish();
             return true;
         }
         return false;
@@ -782,174 +651,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     @OnClick(R.id.testing_imgbtn_close)
     public void closeExam() {
-        checkDataAndExit();
-
-    }
-
-    @OnClick(R.id.image_submit_result)
-    public void sumbitExam() {
-        setSubmitTestBtn(false);
-        submitAnswers();
-
-    }
-
-
-    private void checkDataAndExit() {
-        if (questionLists == null) {
-            exitTest();
-        } else if (questionLists.size() == 0) {
-            exitTest();
-        } else {
-            exitTip();
-        }
-
-    }
-
-    public void exitTip() {
-        String tipString = "";
-        int notDo = questionLists.size() - answerMap.size();
-        if (notDo == 0) {
-            tipString = "您正在评估，退出吗?";
-        } else {
-            tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没评，退出吗?";
-        }
-        BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-            @Override
-            public void onLeftButtonClick(CustomerDialog dialog) {
-                dialog.dismiss();
-                exitTest();
-            }
-
-            @Override
-            public void onRigthButtonClick(CustomerDialog dialog) {
-                dialog.dismiss();
-                settingBtnAble(true);
-            }
-        }, ActDoAssess.this, "退出提示", tipString, "退出", "继续做题", true, true);
-
-
-    }
-
-
-    private void exitTest() {
         finish();
-        overridePendingTransition(android.R.anim.slide_in_left,
-                android.R.anim.slide_out_right);
-    }
 
-
-    private void submitAnswers() {
-        if (answerMap == null) {
-            return;
-        }
-        if (answerMap.size() < questionLists.size()) {
-            //没做完
-            String tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没做，提交试卷吗?";
-            BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-                @Override
-                public void onLeftButtonClick(CustomerDialog dialog) {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
-                    countUserAnswer();
-                }
-
-                @Override
-                public void onRigthButtonClick(CustomerDialog dialog) {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
-                    setSubmitTestBtn(true);
-                }
-            }, ActDoAssess.this, "交卷提示", tipString, "提交", "继续做题", true, true);
-        } else {
-            //做完了
-            countUserAnswer();
-        }
-    }
-
-    public void countUserAnswer() {
-        DialogUtils.showunCancleDialog(this, "提交试卷");
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                ExamAnswerJsonBean jsonBean = new ExamAnswerJsonBean();
-                List<ExamUserAnswer> examUserAnswers = new ArrayList<>();
-                // 遍历出用户的答案
-                for (Map.Entry<String, ExamUserAnswer> answerEntry : answerMap.entrySet()) {
-                    String keyId = answerEntry.getKey();
-                    ExamUserAnswer whichAnswer = answerEntry.getValue();
-                    if (whichAnswer != null) {
-                        examUserAnswers.add(whichAnswer);
-                    }
-                }
-
-                jsonBean.setAnswer(examUserAnswers);
-
-                String jsonString = JSON.toJSONString(jsonBean);
-
-
-                Log.e("sen", jsonString);
-                Message message = Message.obtain();
-                message.obj = jsonString;
-                message.what = SUBMIT_ANSWER_DATA;
-                mHandler.sendMessage(message);
-
-            }
-        }.start();
-    }
-
-
-    public void submitUserAnswer(String answer) {
-        if (!NetUtil.isNetworkConnected(this)) {
-            DialogUtils.closeUnCancleDialog();
-            setSubmitTestBtn(true);
-            Toast.makeText(ActDoAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String url = Constants.PATH + Constants.PATH_SUBMITDEMAND;
-        OkHttpUtils.post()
-                .url(url)
-                .addParams("user_id", AcountManager.getAcountId())
-                .addParams("demand_id", mAssessmentItemBean.getDemand_id())
-                .addParams("de_flag", mAssessmentItemBean.getDe_flag())
-                .addParams("template_id", questionLists.get(0).getTemplate_id())
-                .addParams("demand_user_type", mAssessmentItemBean.getDemand_user_type())
-                .addParams("be_user_id", be_user_id)
-                .addParams("answer", answer)
-                .build()
-                .execute(new Callback<Boolean>() {
-                    @Override
-                    public void onBefore(Request request) {
-                        super.onBefore(request);
-                    }
-
-                    @Override
-                    public Boolean parseNetworkResponse(Response response) throws Exception {
-                        String string = response.body().string();
-                        Log.e("sen", string);
-                        Boolean success = JSON.parseObject(string).getBoolean("success");
-                        if (success != null && success) {
-                            return true;
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void onError(Call call, Exception e) {
-                        mHandler.sendEmptyMessage(SUBMIT_ANSER_ERROR);
-
-
-                    }
-
-                    @Override
-                    public void onResponse(Boolean homeBeam) {
-                        Message message = Message.obtain();
-                        message.obj = homeBeam;
-                        message.what = SUBMIT_ANSER_DEAL;
-                        mHandler.sendMessage(message);
-
-                    }
-                });
     }
 
     public void onEvent(EventNoThing eventNoThing) {
