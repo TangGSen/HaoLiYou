@@ -40,6 +40,11 @@
             android:id="@+id/et_assess_lead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_exam_blank"
+            android:minHeight="80dp"
+            android:textSize="@dimen/common_14sp"
+            android:padding="8dp"
+            android:textColor="@color/font_h2"
             android:layout_marginRight="@dimen/common_8dp"
             android:layout_marginLeft="@dimen/common_8dp"/>
 

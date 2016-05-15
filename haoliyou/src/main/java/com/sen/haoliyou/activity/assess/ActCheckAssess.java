@@ -92,6 +92,8 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
     //总题数
     private int allQusSize;
 
+    private boolean firstShow =true;
+
 
     private List<ActCheckAssessHome.QuListBean> questionLists;
     private final int viewChaceSize = 3;
@@ -123,7 +125,11 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
                     }
                     settingBtnAble(true);
                     showExamQuestion();
-
+                    //第一次就显示答案，以后就是在点下或者上显示
+                    if (firstShow){
+                        showCurrentQuestion();
+                        firstShow =!firstShow;
+                    }
                     break;
 
                 case 2:
@@ -348,6 +354,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         }
 
 
+
         addViewChace(questionLists.get(currentNum).getId(), view);
 
         return view;
@@ -392,10 +399,11 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         showVisbityAble(false, true);
         AppCompatEditText edit = new AppCompatEditText(this);
         edit.setEnabled(false);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         edit.setLayoutParams(params);
+        edit.setMinHeight(250);
         edit.setGravity(Gravity.LEFT);
-        edit.setTextSize(15);
+        edit.setTextSize(14);
         edit.setPadding(16, 16, 16, 16);
         edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
         params.setMargins(0, 32, 0, 32);

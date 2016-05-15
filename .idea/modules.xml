@@ -9,14 +9,9 @@
       <module fileurl="file://$PROJECT_DIR$/HaoLiYou50501.iml" filepath="$PROJECT_DIR$/HaoLiYou50501.iml" />
       <module fileurl="file://$PROJECT_DIR$/HaoLiYou51501.iml" filepath="$PROJECT_DIR$/HaoLiYou51501.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/commonlib/commonlib.iml" filepath="$PROJECT_DIR$/commonlib/commonlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/commonlib/commonlib.iml" filepath="$PROJECT_DIR$/commonlib/commonlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/downloadlib/downloadlib.iml" filepath="$PROJECT_DIR$/downloadlib/downloadlib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/downloadlib/downloadlib.iml" filepath="$PROJECT_DIR$/downloadlib/downloadlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/haoliyou/haoliyou.iml" filepath="$PROJECT_DIR$/haoliyou/haoliyou.iml" />
-      <module fileurl="file://$PROJECT_DIR$/haoliyou/haoliyou.iml" filepath="$PROJECT_DIR$/haoliyou/haoliyou.iml" />
-      <module fileurl="file://$PROJECT_DIR$/videolib/videolib.iml" filepath="$PROJECT_DIR$/videolib/videolib.iml" />
       <module fileurl="file://$PROJECT_DIR$/videolib/videolib.iml" filepath="$PROJECT_DIR$/videolib/videolib.iml" />
     </modules>
   </component>
