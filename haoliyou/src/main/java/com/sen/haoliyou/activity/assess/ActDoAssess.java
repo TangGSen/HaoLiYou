@@ -19,7 +19,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -370,6 +369,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String options_show = questionLists.get(currentNum).getOption();
         if (isAddOpinion){
             et_assess_lead.setVisibility(View.VISIBLE);
+            et_assess_lead.setHint("请写下辅导意见");
             et_assess_lead.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -420,22 +420,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         viewChace.put(key, view);
     }
 
-    //创建EditeText
-    private void createEditTextView(ViewGroup parentView) {
-        AppCompatEditText edit = new AppCompatEditText(this);
-        parentView.addView(edit);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
-        edit.setLayoutParams(params);
-        edit.setGravity(Gravity.LEFT);
-        edit.setTextSize(15);
-        edit.setHint("请写下辅导意见");
-        edit.setHintTextColor(ResourcesUtils.getResColor(ActDoAssess.this, R.color.font_h2));
-        edit.setPadding(16, 16, 16, 16);
-        edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
-        params.setMargins(32, 32, 32, 32);
-        edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
 
-    }
 
 
     //论述和简答题
@@ -639,18 +624,21 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             return;
         }
         //把训后的意见也要找到并显示
-        if(isAddOpinion){
-          String userStr =  currentAnswer.getOpinion();
-          LinearLayout rootView = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
-          AppCompatEditText et = (AppCompatEditText) rootView.getChildAt(1);
-           if (TextUtils.isEmpty(userStr)) {
-               et.setText("");
-           }else{
-               et.setText(userStr);
 
-           }
+        //把训后的意见也要找到并显示
+        if (isAddOpinion) {
+            String userStr =  currentAnswer.getOpinion();
+            AppCompatEditText et = (AppCompatEditText)findViewById(R.id.et_assess_lead);
+            if (TextUtils.isEmpty(userStr)) {
+                et.setText("");
+            } else {
+                et.setText(userStr);
+
+            }
 
         }
+
+
         switch (currtentType) {
             case 1:
                 String[] quesitonAnawser = questionLists.get(currentNum).getOption().split("\\|");
@@ -678,7 +666,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 for (int y = 0; y < questions; y++) {
                     for (int i = 0; i < userQues; i++) {
 
-                        Log.e("sen",y+"___u"+i);
+
                         String checkedItem = quesitonAnawsers[y].split("\\-")[0];
                         if (userAns[i].equals(checkedItem)) {
                             AppCompatCheckBox childAt = (AppCompatCheckBox) layout_other_type_exam.getChildAt(y);
