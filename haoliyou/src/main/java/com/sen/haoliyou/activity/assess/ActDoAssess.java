@@ -361,22 +361,43 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
 //        Log.e("sen", "新建view" + currentNum + 1);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.viewflipper_test, null);
-        LinearLayout root_viewflipper_layout = (LinearLayout) view.findViewById(R.id.root_viewflipper_layout);
+        view = inflater.inflate(R.layout.viewflipper_assess, null);
         tv_test_title = (AppCompatTextView) view.findViewById(R.id.tv_test_title);
         radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
-        String options_show = questionLists.get(currentNum).getOption();
+        AppCompatEditText  et_assess_lead = (AppCompatEditText) view.findViewById(R.id.et_assess_lead);
 
+        String options_show = questionLists.get(currentNum).getOption();
+        if (isAddOpinion){
+            et_assess_lead.setVisibility(View.VISIBLE);
+            et_assess_lead.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    addOptionToAnswer(currentNum, s.toString());
+                }
+            });
+        }else{
+            et_assess_lead.setVisibility(View.GONE);
+        }
         String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title();
         tv_test_title.setText(tv_question_string);
 
         if (currtentType == 1) {
-            showSingleChoose(currentNum, options_show, radio_group_single, root_viewflipper_layout);
+            showSingleChoose(currentNum, options_show, radio_group_single);
         } else if (currtentType == 2) {
-            showMutileChoose(currentNum, options_show, layout_other_type_exam, root_viewflipper_layout);
+            showMutileChoose(currentNum, options_show, layout_other_type_exam);
         } else if (currtentType == 3) {
-            showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam, root_viewflipper_layout);
+            showSubjectiveQuestions(currentNum, options_show, layout_other_type_exam);
         }
         addViewChace(questionLists.get(currentNum).getId(), view);
 
@@ -413,27 +434,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
         params.setMargins(32, 32, 32, 32);
         edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
-        edit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                addOptionToAnswer(currentNum, s.toString());
-            }
-        });
     }
 
 
     //论述和简答题
-    private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
+    private void showSubjectiveQuestions(final int currentNum, String options_show, LinearLayout layout_other_type_exam) {
         showVisbityAble(false, true);
         AppCompatEditText edit = new AppCompatEditText(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -445,8 +451,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         edit.setTextColor(ResourcesUtils.getResColor(this, R.color.primary_text));
         params.setMargins(0, 32, 0, 32);
         edit.setBackgroundDrawable(ResourcesUtils.getResDrawable(this, R.drawable.bg_exam_blank));
-        if (isAddOpinion)
-            createEditTextView(root_viewflipper_layout);
+
         edit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -468,13 +473,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
 
     //显示单选题
-    private void showSingleChoose(final int currentNum, String options, RadioGroup radioGroup, LinearLayout root_viewflipper_layout) {
+    private void showSingleChoose(final int currentNum, String options, RadioGroup radioGroup) {
         showVisbityAble(true, false);
         String[] array_options = options.split("\\|");
         createChooseView(array_options, radioGroup);
-        if (isAddOpinion) {
-            createEditTextView(root_viewflipper_layout);
-        }
+
     }
 
     //把题分成两类，1单选，判断   2.多选，填空，简答，论述
@@ -538,7 +541,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     }
 
-    private void showMutileChoose(final int currentNum, String options, LinearLayout layout_other_type_exam, LinearLayout root_viewflipper_layout) {
+    private void showMutileChoose(final int currentNum, String options, LinearLayout layout_other_type_exam) {
         showVisbityAble(false, false);
         String[] array_options = options.split("\\|");
         int size = array_options.length;
@@ -581,8 +584,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 }
             });
         }
-        if (isAddOpinion)
-            createEditTextView(root_viewflipper_layout);
+
     }
 
     private void showNextQuestion() {
@@ -911,7 +913,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String url = Constants.PATH + Constants.PATH_SUBMITDEMAND;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("user_id", AcountManager.getAcountId())
+                .addParams("user_id1", AcountManager.getAcountId())
                 .addParams("demand_id", mAssessmentItemBean.getDemand_id())
                 .addParams("de_flag", mAssessmentItemBean.getDe_flag())
                 .addParams("template_id", questionLists.get(0).getTemplate_id())

@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_exam_blank"
             android:minHeight="80dp"
+            android:gravity="top"
             android:textSize="@dimen/common_14sp"
             android:padding="8dp"
             android:textColor="@color/font_h2"

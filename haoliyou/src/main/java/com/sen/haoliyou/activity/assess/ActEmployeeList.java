@@ -132,6 +132,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
                     ActCheckAssess.toThis(ActEmployeeList.this,child_itembean,employeeItemBean.getUser_id(),isAddOpinion);
 
                 }
+
             }
         });
 
