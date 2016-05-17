@@ -113,7 +113,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
 
 
         if (elopmyeeAdapter == null) {
-            elopmyeeAdapter = new ActEmployeeAdapter(ActEmployeeList.this, examItemBeanList);
+            elopmyeeAdapter = new ActEmployeeAdapter(ActEmployeeList.this, examItemBeanList,child_itembean.getTime_flag());
             mEmployeeRecylerview.setAdapter(elopmyeeAdapter);
         } else {
             elopmyeeAdapter.notifyDataSetChanged();

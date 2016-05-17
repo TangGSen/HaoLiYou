@@ -19,10 +19,12 @@ import java.util.List;
 public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.ViewHolder> {
     private List<ActEmployeeHome.EmployeeItemBean> mData;
     private Context mContext;
+    private String timeFlag;
 
-    public ActEmployeeAdapter(Context context, List<ActEmployeeHome.EmployeeItemBean> data) {
+    public ActEmployeeAdapter(Context context, List<ActEmployeeHome.EmployeeItemBean> data, String timeFlag) {
         mContext = context;
         mData = data;
+        this.timeFlag =timeFlag;
     }
 
 //    public void addLessonBeanData(List<LessonItemBean> data){
@@ -66,15 +68,20 @@ public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.
         String examTypeStr = "";
         if (examType==0){
             examTypeStr ="评估";
-            holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_type));
+            if (timeFlag.equals("1")){
+                //正在开始状态
+                holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_type));
+            }else {
+                holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_unenter));
+            }
         }else {
             holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_unenter));
             examTypeStr ="查看";
         }
         holder.tv_state_type.setText(examTypeStr);
 
-
-        if (onItemClickListener != null) {
+        //不是结束的状态才能点击
+        if (onItemClickListener != null && !timeFlag.equals("2")) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

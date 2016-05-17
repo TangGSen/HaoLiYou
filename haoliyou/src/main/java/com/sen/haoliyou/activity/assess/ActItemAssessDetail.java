@@ -12,6 +12,7 @@ import com.activeandroid.util.Log;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.AssessmentItemBean;
+import com.sen.haoliyou.tools.ResourcesUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -85,11 +86,8 @@ public class ActItemAssessDetail extends BaseActivity {
         mTvAssessTitle.setText(childItemBean.getDemand_name());
         mTvBeginTime.setText("时间：" + childItemBean.getBegin_date() + "至" + childItemBean.getEnd_date());
 
-        int examType = Integer.parseInt(childItemBean.getTime_flag());
-        if (examType == 0) {
-        } else if (examType == 1) {
-        } else if (examType == 2) {
-        }
+        //设置btn 的样式
+        setBtnAssessStyle();
         //类型判断  评估类型标识，3为满意度评估，4为训前评估，5为训后评估
         int assessType = Integer.parseInt(childItemBean.getDe_flag());
         String assessTypeStr = "";
@@ -97,7 +95,7 @@ public class ActItemAssessDetail extends BaseActivity {
             assessTypeStr = "满意度评估";
 
         } else if (assessType == 4) {
-            assessTypeStr = "训前评估";
+            assessTypeStr = "训前360评估";
 
         } else if (assessType == 5) {
             assessTypeStr = "训后评估";
@@ -108,11 +106,43 @@ public class ActItemAssessDetail extends BaseActivity {
         mTvBelongClass.setText("所属培训班：" + childItemBean.getTc_name());
         mTvAssessIntroduce.setText("评估说明：" + childItemBean.getRemark());
 
-//        if (childItemBean.getIsenter().equals("1") && childItemBean.getExamtype().equals("1")) {
-//            btn_enter_exam.setEnabled(true);
-//        } else {
-//            btn_enter_exam.setEnabled(false);
-//        }
+    }
+
+    private void setBtnAssessStyle(){
+        int examType = Integer.parseInt(childItemBean.getTime_flag());
+        String demand_user_type = childItemBean.getDemand_user_type();
+        String is_submit =childItemBean.getIs_submit();
+        if (examType == 0) {
+            //未开始
+            mBtnEnterAssess.setEnabled(false);
+            mBtnEnterAssess.setText("参加评估");
+        } else if (examType == 1) {
+                //进行中
+            if(is_submit.equals("1")){
+                mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
+                mBtnEnterAssess.setText("查看评估");
+            }else{
+                mBtnEnterAssess.setEnabled(true);
+                mBtnEnterAssess.setText("参加评估");
+            }
+        } else if (examType == 2) {
+            //已结束
+            if ("1".equals(demand_user_type)) {
+                // 操作：训前学员
+                if(is_submit.equals("1")){
+                    mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
+                    mBtnEnterAssess.setText("查看评估");
+                }else{
+                    mBtnEnterAssess.setEnabled(false);
+                    mBtnEnterAssess.setText("参加评估");
+                }
+            } else {
+                // 领导 ，如果是
+                    mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
+                    mBtnEnterAssess.setText("查看评估");
+
+            }
+        }
     }
 
     @OnClick(R.id.btn_enter_assess)
@@ -157,10 +187,6 @@ public class ActItemAssessDetail extends BaseActivity {
                     // 操作：训后学员评估直接进入答题界面
                     Log.e("sen",childItemBean.getDemand_id());
                     ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
-
-
-
-
 
                 } else {
                     // 操作：训后
