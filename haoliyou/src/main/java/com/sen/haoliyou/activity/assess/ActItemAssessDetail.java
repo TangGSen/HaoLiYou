@@ -204,6 +204,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
         } else {
             ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
+                finish();
         }
     }
 

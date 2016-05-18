@@ -25,7 +25,6 @@ import com.sen.haoliyou.base.BaseFragment;
 import com.sen.haoliyou.imgloader.AnimateFirstDisplayListener;
 import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventComentCountForStudy;
-import com.sen.haoliyou.mode.EventKillPositonStudy;
 import com.sen.haoliyou.mode.FragAssessHome;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
@@ -151,7 +150,6 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
         super.onCreate(savedInstanceState);
 
         EventBus.getDefault().register(this);
-        Log.e("sen",AcountManager.getAcountId());
     }
 
     @Override
@@ -175,20 +173,13 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
         return rootView;
     }
 
-    public void onEventMainThread(AssessmentItemBean childItemBean) {
 
-
-    }
 
     public void onEvent(EventComentCountForStudy event) { //接收方法  在发关事件的线程接收
 
     }
 
 
-    public void onEvent(EventKillPositonStudy event) { //接收方法  在发关事件的线程接收
-
-
-    }
 
 
     private void settingRecyleView() {

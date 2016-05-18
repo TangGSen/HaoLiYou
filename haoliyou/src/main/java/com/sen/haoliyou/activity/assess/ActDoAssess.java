@@ -205,6 +205,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         bundle.putBoolean(IS_ADD_OPINION, isAddOpinion);
         intent.putExtra(CHILD_BUNDLE, bundle);
         context.startActivity(intent);
+
     }
 
 
@@ -841,29 +842,16 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
                 @Override
                 public void onLeftButtonClick(CustomerDialog dialog) {
-
+                    dialog.dismiss();
+                    setSubmitTestBtn(true);
                 }
 
                 @Override
                 public void onRigthButtonClick(CustomerDialog dialog) {
 
                 }
-            },250,250,ActDoAssess.this,tipString,"继续做题");
-//            BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-//                @Override
-//                public void onLeftButtonClick(CustomerDialog dialog) {
-//                    if (dialog != null && dialog.isShowing())
-//                        dialog.dismiss();
-//                    countUserAnswer();
-//                }
-//
-//                @Override
-//                public void onRigthButtonClick(CustomerDialog dialog) {
-//                    if (dialog != null && dialog.isShowing())
-//                        dialog.dismiss();
-//                    setSubmitTestBtn(true);
-//                }
-//            }, ActDoAssess.this, "交卷提示", tipString, "提交", "继续做题", true, true);
+            },250,160,ActDoAssess.this,tipString,"继续做题");
+
         } else {
             //做完了
             countUserAnswer();
