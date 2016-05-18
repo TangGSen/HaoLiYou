@@ -47,6 +47,7 @@
             android:padding="8dp"
             android:textColor="@color/font_h2"
             android:layout_marginRight="@dimen/common_8dp"
+            android:layout_marginBottom="?actionBarSize"
             android:layout_marginLeft="@dimen/common_8dp"/>
 
 

@@ -8,7 +8,6 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
-import com.activeandroid.util.Log;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.AssessmentItemBean;
@@ -108,20 +107,20 @@ public class ActItemAssessDetail extends BaseActivity {
 
     }
 
-    private void setBtnAssessStyle(){
+    private void setBtnAssessStyle() {
         int examType = Integer.parseInt(childItemBean.getTime_flag());
         String demand_user_type = childItemBean.getDemand_user_type();
-        String is_submit =childItemBean.getIs_submit();
+        String is_submit = childItemBean.getIs_submit();
         if (examType == 0) {
             //未开始
             mBtnEnterAssess.setEnabled(false);
             mBtnEnterAssess.setText("参加评估");
         } else if (examType == 1) {
-                //进行中
-            if(is_submit.equals("1")){
-                mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
+            //进行中
+            if (is_submit.equals("1")) {
+                mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this, R.drawable.bg_exam_unenter));
                 mBtnEnterAssess.setText("查看评估");
-            }else{
+            } else {
                 mBtnEnterAssess.setEnabled(true);
                 mBtnEnterAssess.setText("参加评估");
             }
@@ -129,17 +128,17 @@ public class ActItemAssessDetail extends BaseActivity {
             //已结束
             if ("1".equals(demand_user_type)) {
                 // 操作：训前学员
-                if(is_submit.equals("1")){
-                    mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
+                if (is_submit.equals("1")) {
+                    mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this, R.drawable.bg_exam_unenter));
                     mBtnEnterAssess.setText("查看评估");
-                }else{
+                } else {
                     mBtnEnterAssess.setEnabled(false);
                     mBtnEnterAssess.setText("参加评估");
                 }
             } else {
                 // 领导 ，如果是
-                    mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this,R.drawable.bg_exam_unenter));
-                    mBtnEnterAssess.setText("查看评估");
+                mBtnEnterAssess.setBackgroundDrawable(ResourcesUtils.getResDrawable(ActItemAssessDetail.this, R.drawable.bg_exam_unenter));
+                mBtnEnterAssess.setText("查看评估");
 
             }
         }
@@ -165,7 +164,8 @@ public class ActItemAssessDetail extends BaseActivity {
 //                类型：满意度评估
 //                操作：进入答题界面
 //                领导评估时的学员ID；学员自评和满意度评估时，传“0” false,"0 双重保障
-                ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
+
+                isUserEnter(false);
 
 
                 break;
@@ -173,29 +173,38 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训前学员评估直接进入答题界面
-                    Log.e("sen",childItemBean.getDemand_id());
-                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
+                    isUserEnter(false);
+
 
                 } else {
                     // 操作：训前领导评估进入下级人员列表界面
-                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean,false);
+                    ActEmployeeList.toThis(ActItemAssessDetail.this, childItemBean, false);
                 }
                 break;
             case 5:
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训后学员评估直接进入答题界面
-                    Log.e("sen",childItemBean.getDemand_id());
-                    ActDoAssess.toThis(ActItemAssessDetail.this,childItemBean,"0", false);
+                    isUserEnter(true);
 
                 } else {
                     // 操作：训后
                     // 领导评估进入下级人员列表界面
-                    ActEmployeeList.toThis(ActItemAssessDetail.this,childItemBean,true);
+                    ActEmployeeList.toThis(ActItemAssessDetail.this, childItemBean, true);
                 }
                 break;
         }
 
+    }
+
+    //根据是否答题
+    private void isUserEnter(boolean isAddOpion) {
+        if (childItemBean.getIs_submit().equals("1")) {
+            ActCheckAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
+
+        } else {
+            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
+        }
     }
 
     @OnClick(R.id.assess_imgbtn_close)

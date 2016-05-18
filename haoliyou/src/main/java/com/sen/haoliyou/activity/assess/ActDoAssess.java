@@ -837,21 +837,33 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         if (answerMap.size() < questionLists.size()) {
             //没做完
             String tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没做，提交试卷吗?";
-            BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
+
+            BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
                 @Override
                 public void onLeftButtonClick(CustomerDialog dialog) {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
-                    countUserAnswer();
+
                 }
 
                 @Override
                 public void onRigthButtonClick(CustomerDialog dialog) {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
-                    setSubmitTestBtn(true);
+
                 }
-            }, ActDoAssess.this, "交卷提示", tipString, "提交", "继续做题", true, true);
+            },250,250,ActDoAssess.this,tipString,"继续做题");
+//            BaseDialogCumstorTip.getDefault().showTwoBtnDialog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
+//                @Override
+//                public void onLeftButtonClick(CustomerDialog dialog) {
+//                    if (dialog != null && dialog.isShowing())
+//                        dialog.dismiss();
+//                    countUserAnswer();
+//                }
+//
+//                @Override
+//                public void onRigthButtonClick(CustomerDialog dialog) {
+//                    if (dialog != null && dialog.isShowing())
+//                        dialog.dismiss();
+//                    setSubmitTestBtn(true);
+//                }
+//            }, ActDoAssess.this, "交卷提示", tipString, "提交", "继续做题", true, true);
         } else {
             //做完了
             countUserAnswer();
@@ -901,7 +913,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String url = Constants.PATH + Constants.PATH_SUBMITDEMAND;
         OkHttpUtils.post()
                 .url(url)
-                .addParams("user_id1", AcountManager.getAcountId())
+                .addParams("user_id", AcountManager.getAcountId())
                 .addParams("demand_id", mAssessmentItemBean.getDemand_id())
                 .addParams("de_flag", mAssessmentItemBean.getDe_flag())
                 .addParams("template_id", questionLists.get(0).getTemplate_id())
