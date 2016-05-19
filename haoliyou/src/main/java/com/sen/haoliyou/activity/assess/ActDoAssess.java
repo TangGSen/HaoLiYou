@@ -31,8 +31,9 @@ import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActDoAssessHome;
 import com.sen.haoliyou.mode.AssessmentItemBean;
+import com.sen.haoliyou.mode.EventAssessSubmit;
+import com.sen.haoliyou.mode.EventAssessSubmitChange;
 import com.sen.haoliyou.mode.EventNoThing;
-import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
 import com.sen.haoliyou.mode.ExamAnswerJsonBean;
 import com.sen.haoliyou.mode.ExamUserAnswer;
 import com.sen.haoliyou.tools.AcountManager;
@@ -77,7 +78,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private static final String CHILD_BUNDLE = "child_bundle";
     private static final String BE_USER_ID = "be_user_id";
     private static final String IS_ADD_OPINION = "isAddOpinion";
+    private static final String IS_ITEMACT_FINISH = "isItemActFinish";
+    private static final String EMPLOYEE_POSITION = "employee_position";
     private boolean isAddOpinion;
+    private boolean isItemActFinish;
+    //领导评第几个学员
+    private int employee_positon;
     private String be_user_id;
     private AssessmentItemBean mAssessmentItemBean;
     private GestureDetector detector;
@@ -174,12 +180,19 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     });
 
 
+
     private void showAnserSecess() {
 
         BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
             public void onLeftButtonClick(CustomerDialog dialog) {
-                EventBus.getDefault().post(new EventSubmitAnswerSucess());
+                if (isItemActFinish){
+                    //这个是直接进来考题并且提交成功，通知AssessFrament 刷新
+                    EventBus.getDefault().post(new EventAssessSubmit(true));
+                }else{
+                    //这个是领导评，学员列表进来的，先改变学员列表的
+                    EventBus.getDefault().post(new EventAssessSubmitChange(employee_positon));
+                }
                 exitTest();
             }
 
@@ -198,13 +211,17 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     }
 
-    public static void toThis(Context context, AssessmentItemBean child_itembean, String be_user_id, boolean isAddOpinion) {
+    public static void toThis(Context context, AssessmentItemBean child_itembean, String be_user_id, boolean isAddOpinion, boolean isItemActFinish, int position) {
         Intent intent = new Intent(context, ActDoAssess.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ASSESSMENT_ITEMBEAN, child_itembean);
         bundle.putString(BE_USER_ID, be_user_id);
         bundle.putBoolean(IS_ADD_OPINION, isAddOpinion);
+        bundle.putBoolean(IS_ITEMACT_FINISH, isItemActFinish);
+        bundle.putInt(EMPLOYEE_POSITION, position);
+
         intent.putExtra(CHILD_BUNDLE, bundle);
+
         context.startActivity(intent);
 
     }
@@ -217,11 +234,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         Bundle bundle = intent.getBundleExtra(CHILD_BUNDLE);
         be_user_id = bundle.getString(BE_USER_ID);
         isAddOpinion = bundle.getBoolean(IS_ADD_OPINION);
-
+        isItemActFinish = bundle.getBoolean(IS_ITEMACT_FINISH);
+        employee_positon = bundle.getInt(EMPLOYEE_POSITION,0);
 
         mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
         if (mAssessmentItemBean == null) {
-            Toast.makeText(ActDoAssess.this, "获取试题失败，请重试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActDoAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
             return;
         }
         assessName = mAssessmentItemBean.getDemand_name();

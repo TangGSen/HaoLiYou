@@ -24,7 +24,7 @@ import com.sen.haoliyou.adapter.AssessmentListAdapter;
 import com.sen.haoliyou.base.BaseFragment;
 import com.sen.haoliyou.imgloader.AnimateFirstDisplayListener;
 import com.sen.haoliyou.mode.AssessmentItemBean;
-import com.sen.haoliyou.mode.EventComentCountForStudy;
+import com.sen.haoliyou.mode.EventAssessSubmit;
 import com.sen.haoliyou.mode.FragAssessHome;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
@@ -112,8 +112,6 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
     });
 
 
-
-
     private void showRecyclerviewItemData(List<AssessmentItemBean> assessData) {
         if (adapter == null) {
             //创建并设置Adapter
@@ -129,7 +127,7 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
 //                    bundle.putInt("itemPosition", position);
 //                    intent.putExtra("FragmentAssessBundle", bundle);
 //                    mActivity.startActivity(intent);
-                    ActItemAssessDetail.toActItemAssessDetail(mActivity,childItemBean,position);
+                    ActItemAssessDetail.toActItemAssessDetail(mActivity, childItemBean, position);
                 }
             });
         } else {
@@ -137,7 +135,6 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
         }
 
     }
-
 
 
     @Override
@@ -174,12 +171,15 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
     }
 
 
-
-    public void onEvent(EventComentCountForStudy event) { //接收方法  在发关事件的线程接收
-
+    public void onEvent(EventAssessSubmit event) { //接收方法  在发关事件的线程接收
+        Log.e("sen","re1");
+        if (event.isReflesh() && NetUtil.isNetworkConnected(mActivity) && assess_recyclerview!=null ) {
+            Log.e("sen","re2");
+            isReFlesh = true;
+            getDataFromNet(AcountManager.getAcountId());
+            isReFlesh = false;
+        }
     }
-
-
 
 
     private void settingRecyleView() {
@@ -196,7 +196,7 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
         swipe_refresh_widget.setOnRefreshListener(this);
 
         //判断RecycleView 上下滑的时候，swipe_refresh_widget 的开关
-        assess_recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        assess_recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int topRowVerticalPosition =
@@ -210,7 +210,6 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
-
 
 
     }
@@ -282,15 +281,12 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
 //
 
 
- 
-
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
         AnimateFirstDisplayListener.displayedImages.clear();
+        mHandler.removeCallbacksAndMessages(null);
     }
 
 

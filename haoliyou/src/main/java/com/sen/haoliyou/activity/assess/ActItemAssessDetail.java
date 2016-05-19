@@ -11,11 +11,14 @@ import android.widget.Toast;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.AssessmentItemBean;
+import com.sen.haoliyou.mode.EventAssessSubmit;
+import com.sen.haoliyou.mode.EventAssessSuess;
 import com.sen.haoliyou.tools.ResourcesUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by Administrator on 2016/3/11.
@@ -43,10 +46,12 @@ public class ActItemAssessDetail extends BaseActivity {
     AppCompatButton mBtnEnterAssess;
 
     AssessmentItemBean childItemBean;
+    private boolean isAssessSubmit;
 
     @Override
     protected void init() {
         super.init();
+
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("FragmentAssessBundle");
         childItemBean = (AssessmentItemBean) bundle.getSerializable("itemBean");
@@ -55,6 +60,7 @@ public class ActItemAssessDetail extends BaseActivity {
             Toast.makeText(this, "获取考试详情出错", Toast.LENGTH_SHORT).show();
             return;
         }
+        EventBus.getDefault().register(this);
     }
 
     public static void toActItemAssessDetail(Context context, AssessmentItemBean childItemBean, int position) {
@@ -165,7 +171,7 @@ public class ActItemAssessDetail extends BaseActivity {
 //                操作：进入答题界面
 //                领导评估时的学员ID；学员自评和满意度评估时，传“0” false,"0 双重保障
 
-                isUserEnter(false);
+                isUserEnter(false,true);
 
 
                 break;
@@ -173,7 +179,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训前学员评估直接进入答题界面
-                    isUserEnter(false);
+                    isUserEnter(false,true);
 
 
                 } else {
@@ -185,7 +191,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训后学员评估直接进入答题界面
-                    isUserEnter(true);
+                    isUserEnter(true,true);
 
                 } else {
                     // 操作：训后
@@ -197,20 +203,28 @@ public class ActItemAssessDetail extends BaseActivity {
 
     }
 
-    //根据是否答题
-    private void isUserEnter(boolean isAddOpion) {
+    /**
+     *
+     * @param isAddOpion 代表是否是训后领导评估
+     * @param isItemActFinish 表示ActIntemAssess 是否是finish ,EnventBus 来分发事件
+     */
+    private void isUserEnter(boolean isAddOpion,boolean isItemActFinish) {
         if (childItemBean.getIs_submit().equals("1")) {
             ActCheckAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
 
         } else {
-            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
-                finish();
+            //但凡直接进的话，该activity 都fininsh ,
+            // isItemActFinish 在ActDoAssess 根据分发，position 是领导评学员的position，在这里 都为0,
+            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion,isItemActFinish,0);
+            finish();
         }
     }
 
     @OnClick(R.id.assess_imgbtn_close)
     public void exitExam() {
         exit();
+        if (isAssessSubmit)
+        EventBus.getDefault().post(new EventAssessSubmit(true));
     }
 
     private void exit() {
@@ -218,6 +232,18 @@ public class ActItemAssessDetail extends BaseActivity {
         overridePendingTransition(android.R.anim.slide_in_left,
                 android.R.anim.slide_out_right);
     }
+
+    public void onEvent(EventAssessSuess event) {
+        isAssessSubmit = true;
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
 
 
 }

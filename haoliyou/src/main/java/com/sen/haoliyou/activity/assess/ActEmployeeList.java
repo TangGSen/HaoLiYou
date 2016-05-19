@@ -20,7 +20,8 @@ import com.sen.haoliyou.adapter.ActEmployeeAdapter;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActEmployeeHome;
 import com.sen.haoliyou.mode.AssessmentItemBean;
-import com.sen.haoliyou.mode.EventSubmitAnswerSucess;
+import com.sen.haoliyou.mode.EventAssessSubmitChange;
+import com.sen.haoliyou.mode.EventAssessSuess;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
 import com.sen.haoliyou.tools.DialogUtils;
@@ -62,6 +63,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     private boolean isReFlesh = false;
 
     private boolean isAddOpinion;
+    private boolean isAssessSubmit;
     private List<ActEmployeeHome.EmployeeItemBean> examItemBeanList;
     private List<ActEmployeeHome.EmployeeItemBean> allExamItemBeanList;
     private ActEmployeeAdapter elopmyeeAdapter;
@@ -126,7 +128,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
             public void onItemClick(View view, int position, ActEmployeeHome.EmployeeItemBean employeeItemBean, int enterType) {
                 if (enterType==0){
                     //进入评估,传被评估的id
-                    ActDoAssess.toThis(ActEmployeeList.this,child_itembean,employeeItemBean.getUser_id(),isAddOpinion);
+                    ActDoAssess.toThis(ActEmployeeList.this,child_itembean,employeeItemBean.getUser_id(), isAddOpinion,false, position);
                 }else{
                     //进入查看
                     ActCheckAssess.toThis(ActEmployeeList.this,child_itembean,employeeItemBean.getUser_id(),isAddOpinion);
@@ -221,13 +223,16 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
         });
     }
 
-    public void onEvent(EventSubmitAnswerSucess event) {
-       /* if (allExamItemBeanList != null) {
-            allExamItemBeanList.clear();
-        }else{
-            allExamItemBeanList = new ArrayList<>();
-        }*/
-        getEmployeeListData();
+    public void onEvent(EventAssessSubmitChange event) {
+        Log.e("sen","emplyeee change__");
+        isAssessSubmit = true;
+        if (allExamItemBeanList !=null && mEmployeeRecylerview!=null && elopmyeeAdapter!=null && event.getPosition()<=allExamItemBeanList.size()){
+            ActEmployeeHome.EmployeeItemBean changItem = allExamItemBeanList.get(event.getPosition());
+            changItem.setCheck_flag("2");
+            elopmyeeAdapter.notifyItemChanged(event.getPosition());
+            Log.e("sen","emplyeee change");
+        }
+
     }
 
 
@@ -297,6 +302,7 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
+        mHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
 
@@ -315,6 +321,8 @@ public class ActEmployeeList extends BaseActivity implements SwipeRefreshLayout.
 
     @OnClick(R.id.employee_back)
     public void back(){
+        if (isAssessSubmit)
+        EventBus.getDefault().post(new EventAssessSuess());
         finish();
     }
 
