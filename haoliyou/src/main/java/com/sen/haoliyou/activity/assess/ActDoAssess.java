@@ -175,7 +175,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
 
     private void showAnserSecess() {
-        BaseDialogCumstorTip.getDefault().showOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
+
+        BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
             public void onLeftButtonClick(CustomerDialog dialog) {
                 EventBus.getDefault().post(new EventSubmitAnswerSucess());
@@ -186,7 +187,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             public void onRigthButtonClick(CustomerDialog dialog) {
 
             }
-        }, 260, 160, ActDoAssess.this, "提交成功", "待考试成绩公布后，您可去PC端查看!", "确定", true, true);
+        },250,160,ActDoAssess.this,"提交成功","确定");
 
     }
 
