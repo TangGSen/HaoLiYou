@@ -180,6 +180,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
     });
 
+    private boolean showLastToast;
+    private boolean showFristToast;
 
 
     private void showAnserSecess() {
@@ -599,7 +601,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum++;
         if (currentNum > allQusSize - 1) {
             currentNum = allQusSize - 1;
-            ToastUtils.showTextToast(ActDoAssess.this,"已经是最后一题啦");
+            //这样有些手机还是不生效，显示很多，那么做限制吧
+            if(!showLastToast){
+                ToastUtils.showTextToast(ActDoAssess.this,"已经是最后一题啦");
+                showLastToast =!showLastToast;
+            }
+
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -617,7 +624,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum--;
         if (currentNum < 0) {
             currentNum = 0;
-            ToastUtils.showTextToast(ActDoAssess.this,"已经是第一题了");
+            if(!showFristToast){
+                ToastUtils.showTextToast(ActDoAssess.this,"已经是第一题了");
+                showFristToast =!showFristToast;
+            }
+
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();

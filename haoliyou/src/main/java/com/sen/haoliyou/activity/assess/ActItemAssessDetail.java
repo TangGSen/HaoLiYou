@@ -191,7 +191,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训后学员评估直接进入答题界面
-                    isUserEnter(true,true);
+                    isUserEnter(false,true);
 
                 } else {
                     // 操作：训后
