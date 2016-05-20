@@ -35,6 +35,7 @@ import com.sen.haoliyou.tools.Constants;
 import com.sen.haoliyou.tools.DialogUtils;
 import com.sen.haoliyou.tools.NetUtil;
 import com.sen.haoliyou.tools.ResourcesUtils;
+import com.sen.haoliyou.tools.ToastUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
 
@@ -477,7 +478,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         currentNum++;
         if (currentNum > allQusSize - 1) {
             currentNum = allQusSize - 1;
-            Toast.makeText(ActCheckAssess.this, "已经是最后一题啦", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActCheckAssess.this,"已经是最后一题啦");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -495,7 +496,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         currentNum--;
         if (currentNum < 0) {
             currentNum = 0;
-            Toast.makeText(ActCheckAssess.this, "已经是第一题了", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActCheckAssess.this,"已经是第一题了");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
