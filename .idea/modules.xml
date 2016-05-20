@@ -2,13 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou050601.iml" filepath="$PROJECT_DIR$/HaoLiYou050601.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou051001.iml" filepath="$PROJECT_DIR$/HaoLiYou051001.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou1.0.0.iml" filepath="$PROJECT_DIR$/HaoLiYou1.0.0.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou1.01.iml" filepath="$PROJECT_DIR$/HaoLiYou1.01.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou50501.iml" filepath="$PROJECT_DIR$/HaoLiYou50501.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou51501.iml" filepath="$PROJECT_DIR$/HaoLiYou51501.iml" />
-      <module fileurl="file://$PROJECT_DIR$/HaoLiYou51701.iml" filepath="$PROJECT_DIR$/HaoLiYou51701.iml" />
       <module fileurl="file://$PROJECT_DIR$/HaoLiYou51901.iml" filepath="$PROJECT_DIR$/HaoLiYou51901.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/commonlib/commonlib.iml" filepath="$PROJECT_DIR$/commonlib/commonlib.iml" />

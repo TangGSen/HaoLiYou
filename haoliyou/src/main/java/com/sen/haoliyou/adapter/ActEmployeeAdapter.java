@@ -63,25 +63,30 @@ public class ActEmployeeAdapter extends RecyclerView.Adapter<ActEmployeeAdapter.
         holder.tv_group_name.setText("组织："+itemBean.getGroup_name());
         holder.tv_organization.setText("部门："+itemBean.getOrganization());
         holder.tv_station_name.setText("岗位："+itemBean.getStation_name());
-
+        boolean isCanclick = false;
+//        大于0表示此学员已被领导评估过，显示“查看”，等于0时，表示未被评估，显示“评估”
         final int examType =Integer.parseInt(itemBean.getCheck_flag());
         String examTypeStr = "";
         if (examType==0){
             examTypeStr ="评估";
             if (timeFlag.equals("1")){
                 //正在开始状态
+                isCanclick = true;
                 holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_type));
             }else {
+                isCanclick = false;
+                //未开始，已结束
                 holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_unenter));
             }
         }else {
+            isCanclick = true;
             holder.tv_state_type.setBackgroundDrawable(ResourcesUtils.getResDrawable(mContext,R.drawable.bg_exam_unenter));
             examTypeStr ="查看";
         }
         holder.tv_state_type.setText(examTypeStr);
 
         //不是结束的状态才能点击
-        if (onItemClickListener != null && !timeFlag.equals("2")) {
+        if (onItemClickListener != null&&isCanclick) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
