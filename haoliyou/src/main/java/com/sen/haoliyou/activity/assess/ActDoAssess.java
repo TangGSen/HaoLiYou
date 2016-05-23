@@ -41,7 +41,6 @@ import com.sen.haoliyou.tools.Constants;
 import com.sen.haoliyou.tools.DialogUtils;
 import com.sen.haoliyou.tools.NetUtil;
 import com.sen.haoliyou.tools.ResourcesUtils;
-import com.sen.haoliyou.tools.ToastUtils;
 import com.sen.haoliyou.widget.BaseDialogCumstorTip;
 import com.sen.haoliyou.widget.CustomerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -81,6 +80,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private static final String IS_ADD_OPINION = "isAddOpinion";
     private static final String IS_ITEMACT_FINISH = "isItemActFinish";
     private static final String EMPLOYEE_POSITION = "employee_position";
+    private static final int OPINION_IS_NULL = 7;
     private boolean isAddOpinion;
     private boolean isItemActFinish;
     //领导评第几个学员
@@ -172,6 +172,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
                 case 6:
                     showNextQuestion();
+                    break;
+                case 7:
+                    //未完成
+                    showDioagUnComplete();
                     break;
             }
             DialogUtils.closeDialog();
@@ -599,7 +603,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum++;
         if (currentNum > allQusSize - 1) {
             currentNum = allQusSize - 1;
-            ToastUtils.showTextToast(ActDoAssess.this,"已经是最后一题啦");
+//            ToastUtils.showTextToast(ActDoAssess.this,"已经是最后一题啦");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -617,7 +621,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         currentNum--;
         if (currentNum < 0) {
             currentNum = 0;
-            ToastUtils.showTextToast(ActDoAssess.this,"已经是第一题了");
+//            ToastUtils.showTextToast(ActDoAssess.this,"已经是第一题了");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -838,7 +842,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 dialog.dismiss();
                 settingBtnAble(true);
             }
-        }, ActDoAssess.this, "退出提示", tipString, "退出", "继续做题", true, true);
+        }, ActDoAssess.this, "退出提示", tipString, "退出", "继续评估", true, true);
 
 
     }
@@ -857,25 +861,28 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
         if (answerMap.size() < questionLists.size()) {
             //没做完
-            String tipString = "您还有" + (questionLists.size() - answerMap.size()) + "题没做，提交试卷吗?";
 
-            BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-                @Override
-                public void onLeftButtonClick(CustomerDialog dialog) {
-                    dialog.dismiss();
-                    setSubmitTestBtn(true);
-                }
-
-                @Override
-                public void onRigthButtonClick(CustomerDialog dialog) {
-
-                }
-            },250,160,ActDoAssess.this,tipString,"继续做题");
+            showDioagUnComplete();
 
         } else {
             //做完了
             countUserAnswer();
         }
+    }
+    //未完成
+    private void showDioagUnComplete() {
+        BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
+            @Override
+            public void onLeftButtonClick(CustomerDialog dialog) {
+                dialog.dismiss();
+                setSubmitTestBtn(true);
+            }
+
+            @Override
+            public void onRigthButtonClick(CustomerDialog dialog) {
+
+            }
+        },250,160,ActDoAssess.this,"评估未完成,不能提交","确定");
     }
 
     public void countUserAnswer() {
@@ -891,6 +898,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     String keyId = answerEntry.getKey();
                     ExamUserAnswer whichAnswer = answerEntry.getValue();
                     if (whichAnswer != null) {
+                        //有领导评估的必填
+                        if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())){
+                            mHandler.sendEmptyMessage(OPINION_IS_NULL);
+                            return;
+                        }
                         examUserAnswers.add(whichAnswer);
                     }
                 }
