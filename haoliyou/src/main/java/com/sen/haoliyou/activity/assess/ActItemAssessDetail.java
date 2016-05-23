@@ -47,6 +47,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
     AssessmentItemBean childItemBean;
     private boolean isAssessSubmit;
+    private int itemPosition;
 
     @Override
     protected void init() {
@@ -55,7 +56,7 @@ public class ActItemAssessDetail extends BaseActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("FragmentAssessBundle");
         childItemBean = (AssessmentItemBean) bundle.getSerializable("itemBean");
-
+        itemPosition  = bundle.getInt("itemPosition");
         if (childItemBean == null) {
             Toast.makeText(this, "获取考试详情出错", Toast.LENGTH_SHORT).show();
             return;
@@ -100,11 +101,14 @@ public class ActItemAssessDetail extends BaseActivity {
             assessTypeStr = "满意度评估";
 
         } else if (assessType == 4) {
-            assessTypeStr = "训前360评估";
+            assessTypeStr = "训前360测评";
 
         } else if (assessType == 5) {
-            assessTypeStr = "训后评估";
-
+            if ("1".equals(childItemBean.getDemand_user_type())) {
+                assessTypeStr = "训后评估";
+            } else {
+                assessTypeStr = "训后辅导评估";
+            }
         }
 
         mTvAssessClass.setText("类型：" + assessTypeStr);
@@ -215,7 +219,7 @@ public class ActItemAssessDetail extends BaseActivity {
         } else {
             //但凡直接进的话，该activity 都fininsh ,
             // isItemActFinish 在ActDoAssess 根据分发，position 是领导评学员的position，在这里 都为0,
-            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion,isItemActFinish,0);
+            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion,isItemActFinish,itemPosition);
             finish();
         }
     }

@@ -25,6 +25,7 @@ import com.sen.haoliyou.base.BaseFragment;
 import com.sen.haoliyou.imgloader.AnimateFirstDisplayListener;
 import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventAssessSubmit;
+import com.sen.haoliyou.mode.EventAssessSubmitPosition;
 import com.sen.haoliyou.mode.FragAssessHome;
 import com.sen.haoliyou.tools.AcountManager;
 import com.sen.haoliyou.tools.Constants;
@@ -179,6 +180,18 @@ public class FragmentAssessment extends BaseFragment implements SwipeRefreshLayo
             getDataFromNet(AcountManager.getAcountId());
             isReFlesh = false;
         }
+    }
+
+
+    public void onEvent(EventAssessSubmitPosition event) {
+        Log.e("sen"," position change__");
+        if (allAssessData !=null && assess_recyclerview!=null && adapter!=null && event.getPosition()<=allAssessData.size()){
+            AssessmentItemBean changItem = allAssessData.get(event.getPosition());
+            changItem.setIs_submit("1");
+            adapter.notifyItemChanged(event.getPosition());
+            Log.e("sen","change___");
+        }
+
     }
 
 

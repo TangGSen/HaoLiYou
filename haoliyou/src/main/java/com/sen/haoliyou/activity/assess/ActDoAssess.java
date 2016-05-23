@@ -31,8 +31,8 @@ import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActDoAssessHome;
 import com.sen.haoliyou.mode.AssessmentItemBean;
-import com.sen.haoliyou.mode.EventAssessSubmit;
 import com.sen.haoliyou.mode.EventAssessSubmitChange;
+import com.sen.haoliyou.mode.EventAssessSubmitPosition;
 import com.sen.haoliyou.mode.EventNoThing;
 import com.sen.haoliyou.mode.ExamAnswerJsonBean;
 import com.sen.haoliyou.mode.ExamUserAnswer;
@@ -41,6 +41,7 @@ import com.sen.haoliyou.tools.Constants;
 import com.sen.haoliyou.tools.DialogUtils;
 import com.sen.haoliyou.tools.NetUtil;
 import com.sen.haoliyou.tools.ResourcesUtils;
+import com.sen.haoliyou.tools.ToastUtils;
 import com.sen.haoliyou.widget.BaseDialogCumstorTip;
 import com.sen.haoliyou.widget.CustomerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -83,8 +84,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     private static final int OPINION_IS_NULL = 7;
     private boolean isAddOpinion;
     private boolean isItemActFinish;
-    //领导评第几个学员
-    private int employee_positon;
+    //领导评第几个学员 或者 第几个评论
+    private int assessPositon;
     private String be_user_id;
     private AssessmentItemBean mAssessmentItemBean;
     private GestureDetector detector;
@@ -119,8 +120,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-
-                    Toast.makeText(ActDoAssess.this, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showTextToast(ActDoAssess.this,"网络异常，请稍后重试");
                     break;
                 case 1:
 
@@ -130,13 +130,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActDoAssess.this,"获取试卷数据失败，请重试");
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActDoAssess.this, "获取试卷数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActDoAssess.this,"获取试卷数据失败，请重试");
                         return false;
                     }
                     settingBtnAble(true);
@@ -151,7 +151,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 case 3:
                     Boolean isSesscess = (Boolean) msg.obj;
                     if (isSesscess) {
-                        Toast.makeText(ActDoAssess.this, "提交成功", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActDoAssess.this,"提交成功");
                         settingBtnAble(false);
                         questionLists.clear();
                         viewChace.clear();
@@ -159,12 +159,12 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
                     } else {
                         setSubmitTestBtn(true);
-                        Toast.makeText(ActDoAssess.this, "提交失败,请重新交卷", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActDoAssess.this,"提交失败,请重新交卷");
                     }
                     break;
                 case 4:
                     setSubmitTestBtn(true);
-                    Toast.makeText(ActDoAssess.this, "提交失败,请重新交卷", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showTextToast(ActDoAssess.this,"提交失败,请重新交卷");
                     break;
                 case 5:
                     showPreQuestion();
@@ -193,10 +193,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             public void onLeftButtonClick(CustomerDialog dialog) {
                 if (isItemActFinish){
                     //这个是直接进来考题并且提交成功，通知AssessFrament 刷新
-                    EventBus.getDefault().post(new EventAssessSubmit(true));
+                    EventBus.getDefault().post(new EventAssessSubmitPosition(assessPositon));
                 }else{
                     //这个是领导评，学员列表进来的，先改变学员列表的
-                    EventBus.getDefault().post(new EventAssessSubmitChange(employee_positon));
+                    EventBus.getDefault().post(new EventAssessSubmitChange(assessPositon));
                 }
                 exitTest();
             }
@@ -240,11 +240,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         be_user_id = bundle.getString(BE_USER_ID);
         isAddOpinion = bundle.getBoolean(IS_ADD_OPINION);
         isItemActFinish = bundle.getBoolean(IS_ITEMACT_FINISH);
-        employee_positon = bundle.getInt(EMPLOYEE_POSITION,0);
+        assessPositon = bundle.getInt(EMPLOYEE_POSITION,0);
 
         mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
         if (mAssessmentItemBean == null) {
-            Toast.makeText(ActDoAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActDoAssess.this,"获取数据失败，请重试");
             return;
         }
         assessName = mAssessmentItemBean.getDemand_name();
@@ -281,7 +281,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     public void getAssessData() {
         if (!NetUtil.isNetworkConnected(this)) {
-            Toast.makeText(ActDoAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActDoAssess.this,"网络未连接");
             return;
         }
         DialogUtils.showunCancleDialog(this, "请稍后");
@@ -900,6 +900,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     if (whichAnswer != null) {
                         //有领导评估的必填
                         if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())){
+                            mHandler.sendEmptyMessage(OPINION_IS_NULL);
+                            return;
+                        }
+                        if (whichAnswer.getType().equals("3") && TextUtils.isEmpty(whichAnswer.getAnswer())){
+                            //简答题也不能为空
                             mHandler.sendEmptyMessage(OPINION_IS_NULL);
                             return;
                         }

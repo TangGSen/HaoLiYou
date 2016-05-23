@@ -47,6 +47,7 @@
             android:layout_gravity="center_vertical"
             android:ellipsize="end"
             android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/common_4dp"
             android:maxLines="1"
             android:text="@string/action_settings"
             android:textColor="@color/font_h2"

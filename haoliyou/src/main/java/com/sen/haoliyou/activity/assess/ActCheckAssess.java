@@ -104,8 +104,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-
-                    Toast.makeText(ActCheckAssess.this, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showTextToast(ActCheckAssess.this,"网络异常，请稍后重试");
                     break;
                 case 1:
 
@@ -115,13 +114,13 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActCheckAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActCheckAssess.this,"获取数据失败，请重试");
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        Toast.makeText(ActCheckAssess.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showTextToast(ActCheckAssess.this,"获取数据失败，请重试");
                         return false;
                     }
                     settingBtnAble(true);
@@ -186,7 +185,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
 
         mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
         if (mAssessmentItemBean == null) {
-            Toast.makeText(ActCheckAssess.this, "获取试题失败，请重试", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActCheckAssess.this,"获取数据失败，请重试");
             return;
         }
         assessName = mAssessmentItemBean.getDemand_name();
@@ -224,7 +223,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
 
     public void getAssessData() {
         if (!NetUtil.isNetworkConnected(this)) {
-            Toast.makeText(ActCheckAssess.this, "网络未连接", Toast.LENGTH_SHORT).show();
+            ToastUtils.showTextToast(ActCheckAssess.this,"网络未连接");
             return;
         }
         DialogUtils.showunCancleDialog(this, "请稍后");
@@ -478,7 +477,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         currentNum++;
         if (currentNum > allQusSize - 1) {
             currentNum = allQusSize - 1;
-            ToastUtils.showTextToast(ActCheckAssess.this,"已经是最后一题啦");
+//            ToastUtils.showTextToast(ActCheckAssess.this,"已经是最后一题啦");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
@@ -496,7 +495,7 @@ public class ActCheckAssess extends BaseActivity implements GestureDetector.OnGe
         currentNum--;
         if (currentNum < 0) {
             currentNum = 0;
-            ToastUtils.showTextToast(ActCheckAssess.this,"已经是第一题了");
+//            ToastUtils.showTextToast(ActCheckAssess.this,"已经是第一题了");
         } else {
             exam_viewflipper.removeAllViews();
             showExamQuestion();
