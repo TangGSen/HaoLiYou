@@ -36,6 +36,8 @@ public class ActItemAssessDetail extends BaseActivity {
     AppCompatTextView mTvAssessTitle;
     @Bind(R.id.tv_begin_time)
     AppCompatTextView mTvBeginTime;
+    @Bind(R.id.tv_end_time)
+    AppCompatTextView mTvEndTime;
     @Bind(R.id.tv_assess_class)
     AppCompatTextView mTvAssessClass;
     @Bind(R.id.tv_belong_class)
@@ -56,7 +58,7 @@ public class ActItemAssessDetail extends BaseActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("FragmentAssessBundle");
         childItemBean = (AssessmentItemBean) bundle.getSerializable("itemBean");
-        itemPosition  = bundle.getInt("itemPosition");
+        itemPosition = bundle.getInt("itemPosition");
         if (childItemBean == null) {
             Toast.makeText(this, "获取考试详情出错", Toast.LENGTH_SHORT).show();
             return;
@@ -90,7 +92,8 @@ public class ActItemAssessDetail extends BaseActivity {
 
     private void showData() {
         mTvAssessTitle.setText(childItemBean.getDemand_name());
-        mTvBeginTime.setText("时间：" + childItemBean.getBegin_date() + "至" + childItemBean.getEnd_date());
+        mTvBeginTime.setText("开始时间：" + childItemBean.getBegin_date() );
+        mTvEndTime.setText("结束时间：" + childItemBean.getEnd_date());
 
         //设置btn 的样式
         setBtnAssessStyle();
@@ -175,7 +178,7 @@ public class ActItemAssessDetail extends BaseActivity {
 //                操作：进入答题界面
 //                领导评估时的学员ID；学员自评和满意度评估时，传“0” false,"0 双重保障
 
-                isUserEnter(false,true);
+                isUserEnter(false, true);
 
 
                 break;
@@ -183,7 +186,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训前学员评估直接进入答题界面
-                    isUserEnter(false,true);
+                    isUserEnter(false, true);
 
 
                 } else {
@@ -195,7 +198,7 @@ public class ActItemAssessDetail extends BaseActivity {
 
                 if ("1".equals(demand_user_type)) {
                     // 操作：训后学员评估直接进入答题界面
-                    isUserEnter(false,true);
+                    isUserEnter(false, true);
 
                 } else {
                     // 操作：训后
@@ -208,18 +211,17 @@ public class ActItemAssessDetail extends BaseActivity {
     }
 
     /**
-     *
-     * @param isAddOpion 代表是否是训后领导评估
+     * @param isAddOpion      代表是否是训后领导评估
      * @param isItemActFinish 表示ActIntemAssess 是否是finish ,EnventBus 来分发事件
      */
-    private void isUserEnter(boolean isAddOpion,boolean isItemActFinish) {
+    private void isUserEnter(boolean isAddOpion, boolean isItemActFinish) {
         if (childItemBean.getIs_submit().equals("1")) {
             ActCheckAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion);
 
         } else {
             //但凡直接进的话，该activity 都fininsh ,
             // isItemActFinish 在ActDoAssess 根据分发，position 是领导评学员的position，在这里 都为0,
-            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion,isItemActFinish,itemPosition);
+            ActDoAssess.toThis(ActItemAssessDetail.this, childItemBean, "0", isAddOpion, isItemActFinish, itemPosition);
             finish();
         }
     }
@@ -228,7 +230,7 @@ public class ActItemAssessDetail extends BaseActivity {
     public void exitExam() {
         exit();
         if (isAssessSubmit)
-        EventBus.getDefault().post(new EventAssessSubmit(true));
+            EventBus.getDefault().post(new EventAssessSubmit(true));
     }
 
     private void exit() {
@@ -247,7 +249,6 @@ public class ActItemAssessDetail extends BaseActivity {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
-
 
 
 }

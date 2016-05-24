@@ -66,6 +66,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/common_8dp"
                 android:text="时间" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/tv_end_time"
+                style="@style/TextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/common_8dp"
+                android:text="时间" />
 
 
 
