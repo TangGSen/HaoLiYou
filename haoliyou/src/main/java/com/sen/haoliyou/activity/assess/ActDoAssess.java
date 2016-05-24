@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSON;
 import com.sen.haoliyou.R;
 import com.sen.haoliyou.base.BaseActivity;
 import com.sen.haoliyou.mode.ActDoAssessHome;
+import com.sen.haoliyou.mode.AssessSubmitResult;
 import com.sen.haoliyou.mode.AssessmentItemBean;
 import com.sen.haoliyou.mode.EventAssessSubmitChange;
 import com.sen.haoliyou.mode.EventAssessSubmitPosition;
@@ -130,13 +131,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        ToastUtils.showTextToast(ActDoAssess.this,"获取试卷数据失败，请重试");
+                        ToastUtils.showTextToast(ActDoAssess.this,"获取数据异常，请重试");
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        ToastUtils.showTextToast(ActDoAssess.this,"获取试卷数据失败，请重试");
+                        ToastUtils.showTextToast(ActDoAssess.this,"获取数据异常，请重试");
                         return false;
                     }
                     settingBtnAble(true);
@@ -149,22 +150,32 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     submitUserAnswer(json);
                     break;
                 case 3:
-                    Boolean isSesscess = (Boolean) msg.obj;
-                    if (isSesscess) {
-                        ToastUtils.showTextToast(ActDoAssess.this,"提交成功");
+                    AssessSubmitResult result = (AssessSubmitResult) msg.obj;
+                    if (result==null){
+                        setSubmitTestBtn(true);
+                        ToastUtils.showTextToast(ActDoAssess.this,"提交异常,请重新提交");
+                        return false;
+                    }
+                    if(result.getSuccess().equals("false")&& result.getAction_flag().equals("0")){
+                        setSubmitTestBtn(true);
+                        ToastUtils.showTextToast(ActDoAssess.this,result.getMessage());
+                    }else  if (result.getSuccess().equals("true")&& result.getAction_flag().equals("1")) {
                         settingBtnAble(false);
                         questionLists.clear();
                         viewChace.clear();
-                        showAnserSecess();
+                        showAnserSecess(result.getMessage());
 
-                    } else {
-                        setSubmitTestBtn(true);
-                        ToastUtils.showTextToast(ActDoAssess.this,"提交失败,请重新交卷");
+                    }  else {
+                        settingBtnAble(false);
+                        questionLists.clear();
+                        viewChace.clear();
+                        //重复提交走的也是这个，评估的状态需要改变，只是显示的msg 不同而已
+                        showAnserSecess(result.getMessage());
                     }
                     break;
                 case 4:
                     setSubmitTestBtn(true);
-                    ToastUtils.showTextToast(ActDoAssess.this,"提交失败,请重新交卷");
+                    ToastUtils.showTextToast(ActDoAssess.this,"提交异常,请重新提交");
                     break;
                 case 5:
                     showPreQuestion();
@@ -184,9 +195,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
     });
 
-
-
-    private void showAnserSecess() {
+    private void showAnserFalse(String message) {
 
         BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
@@ -205,7 +214,30 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             public void onRigthButtonClick(CustomerDialog dialog) {
 
             }
-        },250,160,ActDoAssess.this,"提交成功","确定");
+        },250,160,ActDoAssess.this,message,"确定");
+
+    }
+
+    private void showAnserSecess(String message) {
+
+        BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
+            @Override
+            public void onLeftButtonClick(CustomerDialog dialog) {
+                if (isItemActFinish){
+                    //这个是直接进来考题并且提交成功，通知AssessFrament 刷新
+                    EventBus.getDefault().post(new EventAssessSubmitPosition(assessPositon));
+                }else{
+                    //这个是领导评，学员列表进来的，先改变学员列表的
+                    EventBus.getDefault().post(new EventAssessSubmitChange(assessPositon));
+                }
+                exitTest();
+            }
+
+            @Override
+            public void onRigthButtonClick(CustomerDialog dialog) {
+
+            }
+        },250,160,ActDoAssess.this,message,"确定");
 
     }
 
@@ -886,7 +918,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
     }
 
     public void countUserAnswer() {
-        DialogUtils.showunCancleDialog(this, "提交试卷");
+        DialogUtils.showunCancleDialog(this, "正在提交");
         new Thread() {
             @Override
             public void run() {
@@ -946,21 +978,19 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 .addParams("be_user_id", be_user_id)
                 .addParams("answer", answer)
                 .build()
-                .execute(new Callback<Boolean>() {
+                .execute(new Callback<AssessSubmitResult>() {
                     @Override
                     public void onBefore(Request request) {
                         super.onBefore(request);
                     }
 
                     @Override
-                    public Boolean parseNetworkResponse(Response response) throws Exception {
+                    public AssessSubmitResult parseNetworkResponse(Response response) throws Exception {
                         String string = response.body().string();
                         Log.e("sen", string);
-                        Boolean success = JSON.parseObject(string).getBoolean("success");
-                        if (success != null && success) {
-                            return true;
-                        }
-                        return false;
+                        AssessSubmitResult lesssonBean = JSON.parseObject(string, AssessSubmitResult.class);
+
+                        return lesssonBean;
                     }
 
                     @Override
@@ -971,7 +1001,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     }
 
                     @Override
-                    public void onResponse(Boolean homeBeam) {
+                    public void onResponse(AssessSubmitResult homeBeam) {
                         Message message = Message.obtain();
                         message.obj = homeBeam;
                         message.what = SUBMIT_ANSER_DEAL;
