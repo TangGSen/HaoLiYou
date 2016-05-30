@@ -7,6 +7,16 @@ import java.io.Serializable;
  */
 public class ExamUserAnswer implements Serializable {
     private String id;
+    private int current;
+
+    public int getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(int current) {
+        this.current = current;
+    }
+
     private String answer;
     private String type;
     private String opinion;
@@ -19,7 +29,12 @@ public class ExamUserAnswer implements Serializable {
         this.opinion = opinion;
     }
 
-    public ExamUserAnswer(String id, String answer, String type) {
+    public ExamUserAnswer(String id, String answer, String type,int current) {
+        this.id = id;
+        this.answer = answer;
+        this.type = type;
+        this.current = current;
+    } public ExamUserAnswer(String id, String answer, String type) {
         this.id = id;
         this.answer = answer;
         this.type = type;

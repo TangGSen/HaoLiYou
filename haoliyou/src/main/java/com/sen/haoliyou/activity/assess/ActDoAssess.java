@@ -49,6 +49,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -121,7 +122,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    ToastUtils.showTextToast(ActDoAssess.this,"网络异常，请稍后重试");
+                    ToastUtils.showTextToast(ActDoAssess.this, "网络异常，请稍后重试");
                     break;
                 case 1:
 
@@ -131,13 +132,13 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     if (questionLists == null) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        ToastUtils.showTextToast(ActDoAssess.this,"获取数据异常，请重试");
+                        ToastUtils.showTextToast(ActDoAssess.this, "获取数据异常，请重试");
                         return false;
                     }
                     if (questionLists.size() == 0) {
                         DialogUtils.closeDialog();
                         DialogUtils.closeUnCancleDialog();
-                        ToastUtils.showTextToast(ActDoAssess.this,"获取数据异常，请重试");
+                        ToastUtils.showTextToast(ActDoAssess.this, "获取数据异常，请重试");
                         return false;
                     }
                     settingBtnAble(true);
@@ -151,21 +152,21 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
                 case 3:
                     AssessSubmitResult result = (AssessSubmitResult) msg.obj;
-                    if (result==null){
+                    if (result == null) {
                         setSubmitTestBtn(true);
-                        ToastUtils.showTextToast(ActDoAssess.this,"提交异常,请重新提交");
+                        ToastUtils.showTextToast(ActDoAssess.this, "提交异常,请重新提交");
                         return false;
                     }
-                    if(result.getSuccess().equals("false")&& result.getAction_flag().equals("0")){
+                    if (result.getSuccess().equals("false") && result.getAction_flag().equals("0")) {
                         setSubmitTestBtn(true);
-                        ToastUtils.showTextToast(ActDoAssess.this,result.getMessage());
-                    }else  if (result.getSuccess().equals("true")&& result.getAction_flag().equals("1")) {
+                        ToastUtils.showTextToast(ActDoAssess.this, result.getMessage());
+                    } else if (result.getSuccess().equals("true") && result.getAction_flag().equals("1")) {
                         settingBtnAble(false);
                         questionLists.clear();
                         viewChace.clear();
                         showAnserSecess(result.getMessage());
 
-                    }  else {
+                    } else {
                         settingBtnAble(false);
                         questionLists.clear();
                         viewChace.clear();
@@ -175,7 +176,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
                 case 4:
                     setSubmitTestBtn(true);
-                    ToastUtils.showTextToast(ActDoAssess.this,"提交异常,请重新提交");
+                    ToastUtils.showTextToast(ActDoAssess.this, "提交异常,请重新提交");
                     break;
                 case 5:
                     showPreQuestion();
@@ -186,7 +187,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     break;
                 case 7:
                     //未完成
-                    showDioagUnComplete();
+                    String mes = (String) msg.obj;
+                    showDioagUnComplete(mes);
                     break;
             }
             DialogUtils.closeDialog();
@@ -195,38 +197,16 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
     });
 
-    private void showAnserFalse(String message) {
-
-        BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
-            @Override
-            public void onLeftButtonClick(CustomerDialog dialog) {
-                if (isItemActFinish){
-                    //这个是直接进来考题并且提交成功，通知AssessFrament 刷新
-                    EventBus.getDefault().post(new EventAssessSubmitPosition(assessPositon));
-                }else{
-                    //这个是领导评，学员列表进来的，先改变学员列表的
-                    EventBus.getDefault().post(new EventAssessSubmitChange(assessPositon));
-                }
-                exitTest();
-            }
-
-            @Override
-            public void onRigthButtonClick(CustomerDialog dialog) {
-
-            }
-        },250,160,ActDoAssess.this,message,"确定");
-
-    }
 
     private void showAnserSecess(String message) {
 
         BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
             public void onLeftButtonClick(CustomerDialog dialog) {
-                if (isItemActFinish){
+                if (isItemActFinish) {
                     //这个是直接进来考题并且提交成功，通知AssessFrament 刷新
                     EventBus.getDefault().post(new EventAssessSubmitPosition(assessPositon));
-                }else{
+                } else {
                     //这个是领导评，学员列表进来的，先改变学员列表的
                     EventBus.getDefault().post(new EventAssessSubmitChange(assessPositon));
                 }
@@ -237,7 +217,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             public void onRigthButtonClick(CustomerDialog dialog) {
 
             }
-        },250,160,ActDoAssess.this,message,"确定");
+        }, 250, 160, ActDoAssess.this, message, "确定");
 
     }
 
@@ -272,11 +252,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         be_user_id = bundle.getString(BE_USER_ID);
         isAddOpinion = bundle.getBoolean(IS_ADD_OPINION);
         isItemActFinish = bundle.getBoolean(IS_ITEMACT_FINISH);
-        assessPositon = bundle.getInt(EMPLOYEE_POSITION,0);
+        assessPositon = bundle.getInt(EMPLOYEE_POSITION, 0);
 
         mAssessmentItemBean = (AssessmentItemBean) bundle.getSerializable(ASSESSMENT_ITEMBEAN);
         if (mAssessmentItemBean == null) {
-            ToastUtils.showTextToast(ActDoAssess.this,"获取数据失败，请重试");
+            ToastUtils.showTextToast(ActDoAssess.this, "获取数据失败，请重试");
             return;
         }
         assessName = mAssessmentItemBean.getDemand_name();
@@ -313,7 +293,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
     public void getAssessData() {
         if (!NetUtil.isNetworkConnected(this)) {
-            ToastUtils.showTextToast(ActDoAssess.this,"网络未连接");
+            ToastUtils.showTextToast(ActDoAssess.this, "网络未连接");
             return;
         }
         DialogUtils.showunCancleDialog(this, "请稍后");
@@ -421,10 +401,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         tv_test_title = (AppCompatTextView) view.findViewById(R.id.tv_test_title);
         radio_group_single = (RadioGroup) view.findViewById(R.id.radio_group_single);
         layout_other_type_exam = (LinearLayout) view.findViewById(R.id.layout_other_type_exam);
-        AppCompatEditText  et_assess_lead = (AppCompatEditText) view.findViewById(R.id.et_assess_lead);
+        AppCompatEditText et_assess_lead = (AppCompatEditText) view.findViewById(R.id.et_assess_lead);
 
         String options_show = questionLists.get(currentNum).getOption();
-        if (isAddOpinion){
+        if (isAddOpinion) {
             et_assess_lead.setVisibility(View.VISIBLE);
             et_assess_lead.setHint("请写下辅导意见");
             et_assess_lead.addTextChangedListener(new TextWatcher() {
@@ -443,7 +423,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     addOptionToAnswer(currentNum, s.toString());
                 }
             });
-        }else{
+        } else {
             et_assess_lead.setVisibility(View.GONE);
         }
         String tv_question_string = (currentNum + 1) + ".[" + bitTile + "]" + questionLists.get(currentNum).getTerm_title();
@@ -476,8 +456,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         }
         viewChace.put(key, view);
     }
-
-
 
 
     //论述和简答题
@@ -563,6 +541,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             userAnswer.setOpinion(s);
         } else {
             ExamUserAnswer userAnswer = new ExamUserAnswer();
+            userAnswer.setCurrent(currentNum+1);
             userAnswer.setId(key);
             userAnswer.setType(question.getTerm_type());
             userAnswer.setOpinion(s);
@@ -578,7 +557,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             ExamUserAnswer userAnswer = answerMap.get(key);
             userAnswer.setAnswer(answer);
         } else {
-            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type()));
+            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type(),currentNum+1));
         }
 
     }
@@ -668,7 +647,6 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         String key = questionLists.get(currentNum).getId();
 
 
-
         ExamUserAnswer currentAnswer = answerMap.get(key);
 
 
@@ -684,8 +662,8 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
         //把训后的意见也要找到并显示
         if (isAddOpinion) {
-            String userStr =  currentAnswer.getOpinion();
-            AppCompatEditText et = (AppCompatEditText)findViewById(R.id.et_assess_lead);
+            String userStr = currentAnswer.getOpinion();
+            AppCompatEditText et = (AppCompatEditText) findViewById(R.id.et_assess_lead);
             if (TextUtils.isEmpty(userStr)) {
                 et.setText("");
             } else {
@@ -719,7 +697,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 int questions = quesitonAnawsers.length;
 
                 int userQues = userAns.length;
-                Log.e("sen",questions+"___user"+userQues);
+                Log.e("sen", questions + "___user" + userQues);
                 for (int y = 0; y < questions; y++) {
                     for (int i = 0; i < userQues; i++) {
 
@@ -891,18 +869,138 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
         if (answerMap == null) {
             return;
         }
-        if (answerMap.size() < questionLists.size()) {
+        final int sizeQue = questionLists.size();
+        if (answerMap.size() < sizeQue && answerMap.size() > 0) {
             //没做完
+            DialogUtils.showunCancleDialog(this, "正在提交");
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    int current = 0;
+                    // 记录没有做的题号
+                    boolean isCanSubmit = false;
+                    boolean isOpinionAllNull = false;
+                    //填空等其他三类为null
+                    boolean isTypeNull = false;
+                    List<Integer> list = new ArrayList<Integer>();
 
-            showDioagUnComplete();
+                    // 遍历出用户的答案
+                    for (Map.Entry<String, ExamUserAnswer> answerEntry : answerMap.entrySet()) {
+                        current++;
+                        // 判断是不是辅导意见没做，防止重复add
+                        boolean isOpinionNull = false;
+                        String keyId = answerEntry.getKey();
+                        ExamUserAnswer whichAnswer = answerEntry.getValue();
+                        Log.e("sen",whichAnswer.getCurrent()+"");
+                        if (whichAnswer != null) {
+                            //有领导评估的必填
+                            if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())) {
+                                isOpinionNull = true;
+                                isCanSubmit = true;
+                                list.add(whichAnswer.getCurrent());
+                            }
+                            if (!isAddOpinion && TextUtils.isEmpty(whichAnswer.getAnswer())) {
+                                isCanSubmit = true;
+                                isTypeNull = true;
+                                //简答题也不能为空
+                                if (!isOpinionNull) {
+                                    list.add(whichAnswer.getCurrent());
+                                }
+                            }
 
-        } else {
+                        }
+                //测试
+                        for (Integer integer:list){
+                            Log.e("sen",integer+"____");
+                        }
+
+
+                    }
+
+                    if ( isCanSubmit) {
+                        List<Integer> add = new ArrayList<Integer>();
+                        int size = questionLists.size();
+                        for (int i = 1; i <=size; i++) {
+                            for (int j =0;j<list.size();j++){
+                                if (list.get(j)!=i){
+                                    add.add(i);
+                                }
+                            }
+                        }
+
+                        for (Integer integer:add){
+                            Log.e("sen",integer+"____add");
+                        }
+                        Message message = Message.obtain();
+                        String mes = "";
+                        if (isTypeNull ) {
+                            mes = "未完成，不能提交！";
+                        } else {
+
+                            mes = "辅导意见未完成，不能提交！";
+                        }
+                        list.addAll(add);
+                        Collections.sort(list);
+
+                        for (Integer integer:list){
+                            Log.e("sen",integer+"___all");
+                        }
+                        StringBuilder sb = new StringBuilder();
+                        int listSize = list.size();
+                        for (int i = 0; i < listSize; i++) {
+                            if ( i == (listSize - 1)) {
+                                sb.append(list.get(i)+"");
+                            }else {
+                                sb.append(list.get(i) + ",");
+                            }
+                        }
+                        list.clear();
+                        add.clear();
+                        Log.e("sen", "0评估项[" + sb.toString() + "]" + mes);
+                        message.obj = "评估项[" + sb.toString() + "]" + mes;
+                        message.what = OPINION_IS_NULL;
+                        mHandler.sendMessage(message);
+
+                    }
+
+                }
+            }.start();
+            //   showDioagUnComplete();
+
+        } else if (sizeQue == answerMap.size()) {
             //做完了
             countUserAnswer();
+        } else if (answerMap.size() == 0) {
+            DialogUtils.showunCancleDialog(this, "正在提交");
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    Message message = Message.obtain();
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < sizeQue; i++) {
+                        if ( i == (sizeQue - 1)) {
+                            sb.append((i+1)+"");
+                        }else {
+                            sb.append((i+1) + ",");
+                        }
+                    }
+                    Log.e("sen", "1评估项[" + sb.toString() + "]" + "未完成，不能提交！");
+                    message.obj = "评估项[" + sb.toString() + "]" + "未完成，不能提交！";
+                    message.what = OPINION_IS_NULL;
+                    mHandler.sendMessage(message);
+                }
+            }.start();
         }
     }
+
     //未完成
-    private void showDioagUnComplete() {
+
+    private void showDioagUnComplete(String message) {
+        DialogUtils.closeUnCancleDialog();
+
         BaseDialogCumstorTip.getDefault().showOneMsgOneBtnDilog(new BaseDialogCumstorTip.DialogButtonOnclickLinster() {
             @Override
             public void onLeftButtonClick(CustomerDialog dialog) {
@@ -914,7 +1012,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             public void onRigthButtonClick(CustomerDialog dialog) {
 
             }
-        },250,160,ActDoAssess.this,"评估未完成,不能提交","确定");
+        }, 250, 160, ActDoAssess.this, message, "确定");
     }
 
     public void countUserAnswer() {
@@ -925,25 +1023,67 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 super.run();
                 ExamAnswerJsonBean jsonBean = new ExamAnswerJsonBean();
                 List<ExamUserAnswer> examUserAnswers = new ArrayList<>();
+
+
+                int current = 0;
+                // 记录没有做的题号
+                boolean isCanSubmit = false;
+                List<Integer> list = new ArrayList<Integer>();
+
                 // 遍历出用户的答案
                 for (Map.Entry<String, ExamUserAnswer> answerEntry : answerMap.entrySet()) {
+
+                    current++;
+                    // 判断是不是辅导意见没做，防止重复add
+                    boolean isOpinionNull = false;
                     String keyId = answerEntry.getKey();
                     ExamUserAnswer whichAnswer = answerEntry.getValue();
+
                     if (whichAnswer != null) {
                         //有领导评估的必填
-                        if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())){
-                            mHandler.sendEmptyMessage(OPINION_IS_NULL);
-                            return;
+                        if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())) {
+                            isOpinionNull = true;
+                            isCanSubmit = true;
+                            list.add(whichAnswer.getCurrent());
                         }
-                        if (whichAnswer.getType().equals("3") && TextUtils.isEmpty(whichAnswer.getAnswer())){
+                        if (!isAddOpinion &&TextUtils.isEmpty(whichAnswer.getAnswer())) {
+                            isCanSubmit = true;
+                            isOpinionNull = false;
                             //简答题也不能为空
-                            mHandler.sendEmptyMessage(OPINION_IS_NULL);
+                            if (!isOpinionNull) {
+                                list.add(whichAnswer.getCurrent());
+                            }
+                        }
+                        if (current == answerMap.size() && isCanSubmit) {
+                            Message message = Message.obtain();
+                            String mes = "";
+                            if (isOpinionNull) {
+                                mes = "辅导意见未完成，不能提交！";
+                            } else {
+                                mes = "未完成，不能提交！";
+                            }
+                            Collections.sort(list);
+                            StringBuilder sb = new StringBuilder();
+                            int listSize = list.size();
+                            for (int i = 0; i < listSize; i++) {
+                                if ( i == (listSize - 1)) {
+                                    sb.append(list.get(i)+"");
+                                }else {
+                                    sb.append(list.get(i) + ",");
+                                }
+                            }
+                            Log.e("sen", "2评估项[" + sb.toString() + "]" + mes);
+                            message.obj = "评估项[" + sb.toString() + "]" + mes;
+                            message.what = OPINION_IS_NULL;
+                            mHandler.sendMessage(message);
                             return;
                         }
                         examUserAnswers.add(whichAnswer);
                     }
                 }
 
+
+                Log.e("sen", "华丽的分割线------");
                 jsonBean.setAnswer(examUserAnswers);
 
                 String jsonString = JSON.toJSONString(jsonBean);
