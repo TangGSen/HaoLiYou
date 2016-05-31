@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:layout_marginLeft="@dimen/common_4dp"
-              android:layout_marginRight="@dimen/common_4dp"
+
               android:background="@drawable/customer_dialog_bg"
               android:gravity="center"
               android:orientation="vertical">
@@ -13,8 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:layout_marginLeft="@dimen/common_4dp"
+        android:layout_marginRight="@dimen/common_4dp"
         android:text="退出提示"
-        android:maxLines="4"
+        android:maxLines="3"
         android:ellipsize="end"
         android:textColor="@color/font_h2"
         android:textSize="14sp"/>
