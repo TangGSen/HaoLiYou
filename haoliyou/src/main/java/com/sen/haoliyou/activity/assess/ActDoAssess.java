@@ -541,7 +541,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             userAnswer.setOpinion(s);
         } else {
             ExamUserAnswer userAnswer = new ExamUserAnswer();
-            userAnswer.setCurrent(currentNum+1);
+            userAnswer.setCurrent(currentNum + 1);
             userAnswer.setId(key);
             userAnswer.setType(question.getTerm_type());
             userAnswer.setOpinion(s);
@@ -557,7 +557,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
             ExamUserAnswer userAnswer = answerMap.get(key);
             userAnswer.setAnswer(answer);
         } else {
-            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type(),currentNum+1));
+            answerMap.put(key, new ExamUserAnswer(key, answer, question.getTerm_type(), currentNum + 1));
         }
 
     }
@@ -879,94 +879,63 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     super.run();
                     int current = 0;
                     // 记录没有做的题号
-                    boolean isCanSubmit = false;
                     boolean isOpinionAllNull = false;
                     //填空等其他三类为null
-                    boolean isTypeNull = false;
+                    //存入做过的题号
                     List<Integer> list = new ArrayList<Integer>();
 
                     // 遍历出用户的答案
                     for (Map.Entry<String, ExamUserAnswer> answerEntry : answerMap.entrySet()) {
                         current++;
-                        // 判断是不是辅导意见没做，防止重复add
-                        boolean isOpinionNull = false;
+
                         String keyId = answerEntry.getKey();
                         ExamUserAnswer whichAnswer = answerEntry.getValue();
-                        Log.e("sen",whichAnswer.getCurrent()+"");
+                        Log.e("sen", whichAnswer.getCurrent() + "");
                         if (whichAnswer != null) {
                             //有领导评估的必填
-                            if (isAddOpinion && TextUtils.isEmpty(whichAnswer.getOpinion())) {
-                                isOpinionNull = true;
-                                isCanSubmit = true;
+                            if (isAddOpinion && !TextUtils.isEmpty(whichAnswer.getOpinion()) && !TextUtils.isEmpty(whichAnswer.getAnswer())) {
                                 list.add(whichAnswer.getCurrent());
                             }
-                            if (!isAddOpinion && TextUtils.isEmpty(whichAnswer.getAnswer())) {
-                                isCanSubmit = true;
-                                isTypeNull = true;
+
+                            if (!isAddOpinion && !TextUtils.isEmpty(whichAnswer.getAnswer())) {
                                 //简答题也不能为空
-                                if (!isOpinionNull) {
-                                    list.add(whichAnswer.getCurrent());
-                                }
+                                list.add(whichAnswer.getCurrent());
                             }
-
                         }
-                //测试
-                        for (Integer integer:list){
-                            Log.e("sen",integer+"____");
-                        }
-
 
                     }
-
-                    if ( isCanSubmit) {
-                        List<Integer> add = new ArrayList<Integer>();
-                        int size = questionLists.size();
-                        for (int i = 1; i <=size; i++) {
-                            for (int j =0;j<list.size();j++){
-                                if (list.get(j)!=i){
-                                    add.add(i);
-                                }
-                            }
+                    //存入未做的题号
+                    List<Integer> nullAnsewer = new ArrayList<Integer>();
+                    int size = questionLists.size();
+                    for (int i = 1; i <= size; i++) {
+                        if (!list.contains(i)) {
+                            nullAnsewer.add(i);
                         }
+                    }
+                    Message message = Message.obtain();
 
-                        for (Integer integer:add){
-                            Log.e("sen",integer+"____add");
-                        }
-                        Message message = Message.obtain();
-                        String mes = "";
-                        if (isTypeNull ) {
-                            mes = "未完成，不能提交！";
+                    Collections.sort(nullAnsewer);
+
+                    for (Integer integer : list) {
+                        Log.e("sen", integer + "___all");
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    int listSize = nullAnsewer.size();
+                    for (int i = 0; i < listSize; i++) {
+                        if (i == (listSize - 1)) {
+                            sb.append(nullAnsewer.get(i) + "");
                         } else {
-
-                            mes = "辅导意见未完成，不能提交！";
+                            sb.append(nullAnsewer.get(i) + ",");
                         }
-                        list.addAll(add);
-                        Collections.sort(list);
-
-                        for (Integer integer:list){
-                            Log.e("sen",integer+"___all");
-                        }
-                        StringBuilder sb = new StringBuilder();
-                        int listSize = list.size();
-                        for (int i = 0; i < listSize; i++) {
-                            if ( i == (listSize - 1)) {
-                                sb.append(list.get(i)+"");
-                            }else {
-                                sb.append(list.get(i) + ",");
-                            }
-                        }
-                        list.clear();
-                        add.clear();
-                        Log.e("sen", "0评估项[" + sb.toString() + "]" + mes);
-                        message.obj = "评估项[" + sb.toString() + "]" + mes;
-                        message.what = OPINION_IS_NULL;
-                        mHandler.sendMessage(message);
-
                     }
+
+                    message.obj = "评估项[" + sb.toString() + "]" + "未完成，不能提交！";
+                    message.what = OPINION_IS_NULL;
+                    mHandler.sendMessage(message);
+
 
                 }
             }.start();
-            //   showDioagUnComplete();
 
         } else if (sizeQue == answerMap.size()) {
             //做完了
@@ -981,10 +950,10 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < sizeQue; i++) {
-                        if ( i == (sizeQue - 1)) {
-                            sb.append((i+1)+"");
-                        }else {
-                            sb.append((i+1) + ",");
+                        if (i == (sizeQue - 1)) {
+                            sb.append((i + 1) + "");
+                        } else {
+                            sb.append((i + 1) + ",");
                         }
                     }
                     Log.e("sen", "1评估项[" + sb.toString() + "]" + "未完成，不能提交！");
@@ -1028,6 +997,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                 int current = 0;
                 // 记录没有做的题号
                 boolean isCanSubmit = false;
+                boolean isTypeNull = false;
                 List<Integer> list = new ArrayList<Integer>();
 
                 // 遍历出用户的答案
@@ -1036,6 +1006,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                     current++;
                     // 判断是不是辅导意见没做，防止重复add
                     boolean isOpinionNull = false;
+
                     String keyId = answerEntry.getKey();
                     ExamUserAnswer whichAnswer = answerEntry.getValue();
 
@@ -1046,9 +1017,11 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                             isCanSubmit = true;
                             list.add(whichAnswer.getCurrent());
                         }
-                        if (!isAddOpinion &&TextUtils.isEmpty(whichAnswer.getAnswer())) {
+                        if (TextUtils.isEmpty(whichAnswer.getAnswer())) {
                             isCanSubmit = true;
-                            isOpinionNull = false;
+                            if (!isTypeNull) {
+                                isTypeNull = true;
+                            }
                             //简答题也不能为空
                             if (!isOpinionNull) {
                                 list.add(whichAnswer.getCurrent());
@@ -1057,18 +1030,19 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                         if (current == answerMap.size() && isCanSubmit) {
                             Message message = Message.obtain();
                             String mes = "";
-                            if (isOpinionNull) {
-                                mes = "辅导意见未完成，不能提交！";
-                            } else {
+                            if (isTypeNull || (!isTypeNull && !isAddOpinion)) {
                                 mes = "未完成，不能提交！";
+
+                            } else if (!isTypeNull && isAddOpinion) {
+                                mes = "辅导意见未完成，不能提交！";
                             }
                             Collections.sort(list);
                             StringBuilder sb = new StringBuilder();
                             int listSize = list.size();
                             for (int i = 0; i < listSize; i++) {
-                                if ( i == (listSize - 1)) {
-                                    sb.append(list.get(i)+"");
-                                }else {
+                                if (i == (listSize - 1)) {
+                                    sb.append(list.get(i) + "");
+                                } else {
                                     sb.append(list.get(i) + ",");
                                 }
                             }
