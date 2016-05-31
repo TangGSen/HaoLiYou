@@ -420,7 +420,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    addOptionToAnswer(currentNum, s.toString());
+                    addOptionToAnswer(currentNum, s.toString().trim());
                 }
             });
         } else {
@@ -485,7 +485,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
             @Override
             public void afterTextChanged(Editable s) {
-                addToAnswer(currentNum, s.toString());
+                addToAnswer(currentNum, s.toString().trim());
             }
         });
         layout_other_type_exam.addView(edit);
