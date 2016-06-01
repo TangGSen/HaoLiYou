@@ -14,6 +14,7 @@ public class Constants {
 //	 public static final String PATH = "http://sec.cncm.com.cn/";
 //    public static final String PATH = "http://111.202.9.28:15030/";
     public static final String PATH = "http://119.57.68.35:15200/";
+//    public static final String PATH = "http://ele.orion.com.cn";
 //    public static final String PATH = "http://192.168.50.102:8080/";
 
 
