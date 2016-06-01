@@ -10,16 +10,12 @@ public class Constants {
     //接口
 
     // 外网地址
-//    public static final String PATH = "http://192.168.50.20/";
-//	 public static final String PATH = "http://sec.cncm.com.cn/";
-//    public static final String PATH = "http://111.202.9.28:15030/";
-    public static final String PATH = "http://119.57.68.35:15200/";
-//    public static final String PATH = "http://ele.orion.com.cn";
-//    public static final String PATH = "http://192.168.50.102:8080/";
+    public static final String PATH = "http:///";
+
 
 
     //    1.app 更新
-    public static final String APK_PATH = "http://139.129.8.158/www/resource/phoneDownload/android.html";
+    public static final String APK_PATH = PATH+"www/resource/phoneDownload/android.html";
 
 
     // 1.登陆

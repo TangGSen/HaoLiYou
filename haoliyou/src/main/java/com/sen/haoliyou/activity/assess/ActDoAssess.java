@@ -929,7 +929,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                         }
                     }
 
-                    message.obj = "评估项[" + sb.toString() + "]" + "未完成，不能提交！";
+                    message.obj = "评估项\n[" + sb.toString() + "]" + "未完成，不能提交！";
                     message.what = OPINION_IS_NULL;
                     mHandler.sendMessage(message);
 
@@ -950,22 +950,16 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
 
                     StringBuilder sb = new StringBuilder();
                     //只显示前20个，后面的...,因为在某些低分辨率没显示全，导致后面的显示不出来，以后版本要根据分辨率设置控件地 间距和字体（有空在做）
-                    int sizeQues =sizeQue;
-                    if (sizeQue>20){
-                        sizeQues =20;
-                    }
-                    for (int i = 0; i < sizeQues; i++) {
-                        if (i == (sizeQues - 1)) {
-                            if (sizeQue>20) {
-                                sb.append((i + 1) + "...");
-                            }else {
+
+                    for (int i = 0; i < sizeQue; i++) {
+                        if (i == (sizeQue - 1)) {
+
                                 sb.append((i + 1) + "");
-                            }
                         } else {
                             sb.append((i + 1) + ",");
                         }
                     }
-                    message.obj = "评估项[" + sb.toString() + "]" + "未完成，不能提交！";
+                    message.obj = "评估项\n[" + sb.toString() + "]" + "未完成，不能提交！";
                     message.what = OPINION_IS_NULL;
                     mHandler.sendMessage(message);
                 }
@@ -1056,7 +1050,7 @@ public class ActDoAssess extends BaseActivity implements GestureDetector.OnGestu
                                     sb.append(list.get(i) + ",");
                                 }
                             }
-                            message.obj = "评估项[" + sb.toString() + "]" + mes;
+                            message.obj = "评估项\n[" + sb.toString() + "]" + mes;
                             message.what = OPINION_IS_NULL;
                             mHandler.sendMessage(message);
                             return;
