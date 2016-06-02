@@ -8,7 +8,7 @@ android {
         applicationId "com.sen.haoliyou"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 3
+        versionCode 5
         versionName "2.0.0"
     }
     buildTypes {
